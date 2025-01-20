@@ -7,92 +7,95 @@ from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeybo
 import actions_manager
 import bot_manager
 
+from config_manager import translation
+
 config=configparser.ConfigParser()
 config.read("config.ini", encoding='utf-8')
+
 
 class Keyboard():
     """Кнопки"""
 
     BUTTONS_MENU = [
-        ('🖼Медиа','⚙️ПК', '📱Информация',),
-        ('🗂Программы','🧠ChatGPT', '🪄Сценарии',),
-        ('🌐Интернет',),
+        (translation.TG_BOT.BUTTON_MEDIA,translation.TG_BOT.BUTTON_PC, translation.TG_BOT.BUTTON_INFO,),
+        (translation.TG_BOT.BUTTON_PROGRAMS,translation.TG_BOT.BUTTON_CHATGPT, translation.TG_BOT.BUTTON_SCRIPTS,),
+        (translation.TG_BOT.BUTTON_INTERNET,),
     ]
     BUTTONS_VIDEO = [
-        ('Звук🔈',),
-        ('🔉', '🔇', '🔊'),
-        ('⬅️','⏸','➡️',),
-        ('◀️Видео', 'Видео▶️',),
-        ('🖥Во весь экран',),
-        ('🔗Открыть ссылку',),
-        ('🧩Меню', '🖼Медиа',),
+        (translation.TG_BOT.BUTTON_VOLUME,),
+        (translation.TG_BOT.BUTTON_VOLUME_DOWN, translation.TG_BOT.BUTTON_VOLUME_MUTE, translation.TG_BOT.BUTTON_VOLUME_UP),
+        (translation.TG_BOT.BUTTON_VIDEO_GO_BACKWARD,translation.TG_BOT.BUTTON_VIDEO_PLAY_PAUSE,translation.TG_BOT.BUTTON_VIDEO_SKIP_FORWARD,),
+        (translation.TG_BOT.BUTTON_VIDEO_PREV_VIDEO, translation.TG_BOT.BUTTON_VIDEO_NEXT_VIDEO,),
+        (translation.TG_BOT.BUTTON_VIDEO_FULLSCREEN,),
+        (translation.TG_BOT.BUTTON_OPEN_LINK,),
+        (translation.TG_BOT.BUTTON_MENU, translation.TG_BOT.BUTTON_MEDIA,),
     ]
     BUTTONS_MUSIC = [
-        ('Звук🔈',),
-        ('🔉', '🔇', '🔊'),
-        ('⏮', '⏯', '⏭'),
-        ('🧩Меню', '🖼Медиа',),
+        (translation.TG_BOT.BUTTON_VOLUME,),
+        (translation.TG_BOT.BUTTON_VOLUME_DOWN, translation.TG_BOT.BUTTON_VOLUME_MUTE, translation.TG_BOT.BUTTON_VOLUME_UP),
+        (translation.TG_BOT.BUTTON_SOUND_PREV_TRACK, translation.TG_BOT.BUTTON_SOUND_PLAY_PAUSE, translation.TG_BOT.BUTTON_SOUND_NEXT_TRACK),
+        (translation.TG_BOT.BUTTON_MENU, translation.TG_BOT.BUTTON_MEDIA,),
     ]
     BUTTONS_MEDIA = [
-        ('📹Видео',),
-        ('🎧Музыка',),
-        ('🧩Меню',),
+        (translation.TG_BOT.BUTTON_VIDEO,),
+        (translation.TG_BOT.BUTTON_MUSIC,),
+        (translation.TG_BOT.BUTTON_MENU,),
     ]
     BUTTONS_CONTROL_PC = [
-            ('🖥Характеристики ПК', '📁Папки'),
-            ('🔒Блокировка', '☀️Яркость', '❌Закрыть',),
-            ('🖼Сменить обои','💬Смс на экран', '🗑Очисти корзину',),
-            ('🖼Скрин Веб-камеры', '🖼Скрин',),
-            ('🔋Управление питанием ПК','⌨️Управление девайсами ПК',),
-            ('🗒Диспетчер задач',),
-            ('🧩Меню',),
+        (translation.TG_BOT.BUTTON_PC_SPEC, translation.TG_BOT.BUTTON_PC_FOLDERS),
+        (translation.TG_BOT.BUTTON_PC_LOCK_WORKSTATION, translation.TG_BOT.BUTTON_PC_BRIGHTNESS, translation.TG_BOT.BUTTON_PC_CLOSE_ACTIVE_WINDOW,),
+        (translation.TG_BOT.BUTTON_PC_CHANGE_WALLPAPER,translation.TG_BOT.BUTTON_PC_TEXT_ALERT, translation.TG_BOT.BUTTON_PC_CLEAR_RECYCLE_BIN,),
+        (translation.TG_BOT.BUTTON_PC_WEBCAM_SCREENSHOT, translation.TG_BOT.BUTTON_PC_SCREENSHOT,),
+        (translation.TG_BOT.BUTTON_PC_POWER_MANAGEMENT,translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT,),
+        (translation.TG_BOT.BUTTON_PC_TASK_MANAGER,),
+        (translation.TG_BOT.BUTTON_MENU,),
     ]
     BUTTONS_CONTROL_POWER =[
-        ('😴Спящий режим', '💤Гибернация','🔄Перезагрузка',),
-        ('🚫Выключение ПК',),
-        ('⏳Таймер на выключение ПК',),
-        ('❌Отмена таймера',),
-        ('🧩Меню','⚙️ПК',),
+        (translation.TG_BOT.BUTTON_POWER_CONTROL_SLEEP, translation.TG_BOT.BUTTON_POWER_CONTROL_HIBERNATE,translation.TG_BOT.BUTTON_POWER_CONTROL_REBOOT,),
+        (translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN,),
+        (translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER,),
+        (translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER_CANCEL,),
+        (translation.TG_BOT.BUTTON_MENU,translation.TG_BOT.BUTTON_PC,),
     ]
     BUTTONS_CONTROL_DEVICES = [
-        ('🖱Управление мышкой',),
-        ('⌨️Управление клавиатурой',),
-        ('🖥Отключить монитор',),
-        ('🧩Меню','⚙️ПК',),
+        (translation.TG_BOT.BUTTON_DEVICE_CONTROL_MOUSE,),
+        (translation.TG_BOT.BUTTON_DEVICE_CONTROL_KEYBOARD,),
+        (translation.TG_BOT.BUTTON_DEVICE_CONTROL_TURN_OFF_MONITOR,),
+        (translation.TG_BOT.BUTTON_MENU,translation.TG_BOT.BUTTON_PC,),
     ]
     BUTTONS_CONTROL_MOUSE = [
-        ('ЛКМ','ПКМ',),
-        ('🔼',),
-        ('◀️','🔽','▶️',),
-        ('🖱Перемещение по X,Y',),
-        ('🧩Меню','⌨️Управление девайсами ПК',),
+        (translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE1,translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE2,),
+        (translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_UP,),
+        (translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_LEFT,translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_DOWN,translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_RIGHT,),
+        (translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_TO_COORDINATES,),
+        (translation.TG_BOT.BUTTON_MENU,translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT,),
     ]
     BUTTONS_INFO = [
-            ('💵Доллар','🤑Биткоин','💶Евро',),
-            ('⛅️Погода','🕘Дата',),
-            ('🧩Меню',),
+        (translation.TG_BOT.BUTTON_DOLLAR,translation.TG_BOT.BUTTON_BTC,translation.TG_BOT.BUTTON_EURO,),
+        (translation.TG_BOT.BUTTON_WEATHER,translation.TG_BOT.BUTTON_DATE,),
+        (translation.TG_BOT.BUTTON_MENU,),
     ]
     BUTTONS_INTERNET = [
-            ('🌐Speedtest',),
-            ('🔗Открыть ссылку',),
-            ('🧩Меню',),
+        (translation.TG_BOT.BUTTON_SPEEDTEST,),
+        (translation.TG_BOT.BUTTON_OPEN_LINK,),
+        (translation.TG_BOT.BUTTON_MENU,),
     ]
     BUTTONS_CONTROL_BRIGHTNESS = [
-        ( '☀️100%',),
-        ('☀️25%', '☀️50%', '☀️75%',),
-        ('☀️0%',),
-        ('🧩Меню','⚙️ПК',),
+        (translation.TG_BOT.BUTTON_BRIGHTNESS_SET_100_PCT,),
+        (translation.TG_BOT.BUTTON_BRIGHTNESS_SET_25_PCT, translation.TG_BOT.BUTTON_BRIGHTNESS_SET_50_PCT, translation.TG_BOT.BUTTON_BRIGHTNESS_SET_75_PCT,),
+        (translation.TG_BOT.BUTTON_BRIGHTNESS_SET_0_PCT,),
+        (translation.TG_BOT.BUTTON_MENU,translation.TG_BOT.BUTTON_PC,),
     ]
     BUTTONS_CONTROL_KEYBOARD = [
-        ('✍️Ввод текста',),
-        ('🔠Нажатие кнопки',),
-        ('🧩Меню','⌨️Управление девайсами ПК',),
+        (translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_TYPE,),
+        (translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_PRESS_BUTTON,),
+        (translation.TG_BOT.BUTTON_MENU,translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT,),
     ]
 
     BUTTONS_ADMIN = [
-        ('🔐Сменить пароль',),
-        ('🧹Очистить папку Temp',),
-        ('🧩Меню',),
+        (translation.TG_BOT.BUTTON_ADMIN_CHANGE_PASSWORD,),
+        (translation.TG_BOT.BUTTON_ADMIN_CLEAR_TEMP_FOLDER,),
+        (translation.TG_BOT.BUTTON_MENU,),
     ]
 
     def add_buttons(self) -> ReplyKeyboardMarkup:
@@ -103,10 +106,10 @@ class Keyboard():
             buttons.row(*button_row)
             
         if actions_manager.Actions().check_if_admin():
-            buttons.row('⚠️Админ')
+            buttons.row(translation.TG_BOT.BUTTON_ADMIN)
 
         if config.getboolean('Settings', 'jarvis'):
-            buttons.row('🤖Команда Джарвису')
+            buttons.row(translation.TG_BOT.BUTTON_COMMAND_FOR_JARVIS)
 
         return buttons
     
@@ -118,7 +121,7 @@ class Keyboard():
             menu = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                        '⚠️Админ',
+                        translation.TG_BOT.MSG_ADMIN,
                         reply_markup=menu) 
 
     def add_buttons_music(self, chat_id) -> None:
@@ -129,7 +132,7 @@ class Keyboard():
             menu = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                        '🎧Музыка',
+                        translation.TG_BOT.BUTTON_MUSIC,
                         reply_markup=menu)            
     
     def add_buttons_video(self, chat_id) -> None:
@@ -140,7 +143,7 @@ class Keyboard():
             menu = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                        '📹Видео',
+                        translation.TG_BOT.BUTTON_VIDEO,
                         reply_markup=menu)
 
     def add_buttons_menu(self, chat_id) -> ReplyKeyboardMarkup:
@@ -151,13 +154,13 @@ class Keyboard():
             buttons.row(*button_row)
             
         if actions_manager.Actions().check_if_admin():
-            buttons.row('⚠️Админ')
+            buttons.row(translation.TG_BOT.BUTTON_ADMIN)
 
         if config.getboolean('Settings', 'jarvis'):
-            buttons.row('🤖Команда Джарвису')
+            buttons.row(translation.TG_BOT.BUTTON_COMMAND_FOR_JARVIS)
 
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🧩Меню',
+                            translation.TG_BOT.BUTTON_MENU,
                             reply_markup=buttons
         )
 
@@ -169,7 +172,7 @@ class Keyboard():
             menu_media = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id,
-                            '🖼Медиа',
+                            translation.TG_BOT.BUTTON_MEDIA,
                             reply_markup=menu_media)
         
     def add_buttons_control_pc(self, chat_id) -> None:
@@ -180,7 +183,7 @@ class Keyboard():
             menu_pc = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '⚙️Управление ПК',
+                            translation.TG_BOT.MSG_PC,
                             reply_markup=menu_pc)
 
     def add_buttons_control_power(self, chat_id) -> None:
@@ -191,7 +194,7 @@ class Keyboard():
             menu_pc = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🔋Управление питанием ПК',
+                            translation.TG_BOT.BUTTON_PC_POWER_MANAGEMENT,
                             reply_markup=menu_pc)
 
     def add_buttons_control_devices(self, chat_id) -> None:
@@ -202,7 +205,7 @@ class Keyboard():
             menu_pc = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '⌨️Управление девайсами ПК',
+                            translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT,
                             reply_markup=menu_pc)
 
     def add_buttons_control_mouse(self, chat_id) -> None:
@@ -213,7 +216,7 @@ class Keyboard():
             menu_pc = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🖱Управление мышкой',
+                            translation.TG_BOT.BUTTON_DEVICE_CONTROL_MOUSE,
                             reply_markup=menu_pc)
     
     def add_buttons_control_keyboard(self, chat_id) -> None:
@@ -224,7 +227,7 @@ class Keyboard():
             menu_pc = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '⌨️Управление клавиатурой',
+                            translation.TG_BOT.BUTTON_DEVICE_CONTROL_KEYBOARD,
                             reply_markup=menu_pc)
         
     def add_buttons_info(self, chat_id) -> None:
@@ -235,7 +238,7 @@ class Keyboard():
             menu_info = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '📱Информация',
+                            translation.TG_BOT.BUTTON_INFO,
                             reply_markup=menu_info)
         
     def add_buttons_internet(self, chat_id) -> None:
@@ -246,7 +249,7 @@ class Keyboard():
             menu_info = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🌐Интернет',
+                            translation.TG_BOT.BUTTON_INTERNET,
                             reply_markup=menu_info)
     
     def add_buttons_script(self, chat_id) -> None:
@@ -260,7 +263,7 @@ class Keyboard():
             data = json.load(f)
         
         for script in data:
-            btn = f'Сценарий {script["name"]} {random.choice(emoji)}'
+            btn = translation.TG_BOT.BUTTON_SCRIPT_OPEN.format(script_name=script["name"], emoji=random.choice(emoji))
             if len(row_button) < 3:
                 row_button.append(btn)
             else:
@@ -272,10 +275,10 @@ class Keyboard():
         for button in BUTTONS:
             menu_info = buttons.row(*button)
         
-        menu_info = buttons.row('🧩Меню')
+        menu_info = buttons.row(translation.TG_BOT.BUTTON_MENU)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🪄Сценарии',
+                            translation.TG_BOT.BUTTON_SCRIPTS,
                             reply_markup=menu_info)
 
     def add_buttons_program(self, chat_id) -> None:
@@ -289,7 +292,7 @@ class Keyboard():
             data = json.load(f)
         
         for programm in enumerate(data):
-            btn = f'Открыть {programm[1]["name"]} {random.choice(emoji)}'
+            btn = translation.TG_BOT.BUTTON_PROGRAM_OPEN.format(program_name=programm[1]["name"], emoji=random.choice(emoji))
             if len(row_button) < 3:
                 row_button.append(btn)
             else:
@@ -301,10 +304,10 @@ class Keyboard():
         for button in BUTTONS:
             menu_info = buttons.row(*button)
         
-        menu_info = buttons.row('🧩Меню')
+        menu_info = buttons.row(translation.TG_BOT.BUTTON_MENU)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '🗂Программы',
+                            translation.TG_BOT.BUTTON_PROGRAMS,
                             reply_markup=menu_info)
     
     def add_buttons_brightness(self, chat_id) -> None:
@@ -315,5 +318,5 @@ class Keyboard():
             menu_info = buttons.row(*button)
         
         bot_manager.Telegram().bot.send_message(chat_id, 
-                            '☀️Яркость',
+                            translation.TG_BOT.BUTTON_PC_BRIGHTNESS,
                             reply_markup=menu_info)

@@ -15,7 +15,7 @@ from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeybo
 
 import keyboard_manager
 import actions_manager
-from config_manager import NIRCMD, CHAT_GPT
+from config_manager import NIRCMD, CHAT_GPT, PATH_TO_VOICE_LINES_FOLDER, translation
 import explorer_manager
 import license_manager
 import ui
@@ -48,7 +48,7 @@ class Telegram():
                     path, page, markup = explorer_manager.Explorer().scanning_folders(desktop_path)
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id,
                                                     message_id=call.message.message_id,
-                                                    text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                    text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
 
                 elif command == 'previous_page':
                     if page != 1:
@@ -57,14 +57,14 @@ class Telegram():
                     path, page, markup = explorer_manager.Explorer().scanning_folders(path, page)
 
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id,
-                                                        text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                        text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
                 elif command == 'next_page':
                     path, page, markup = explorer_manager.Explorer().scanning_folders(path, page + 1)
 
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id,
-                                                        text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                        text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
                 elif command == 'back_to_drives':
-                    edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id, text="💿Выберите диск:",
+                    edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id, text=translation.TG_BOT.MSG_EXPLORER_ASK_CHOOSE_DRIVE,
                                                         reply_markup=explorer_manager.Explorer().scanning_drives())
                 elif command == 'back_explorer':
 
@@ -73,7 +73,7 @@ class Telegram():
                     path, page, markup = explorer_manager.Explorer().scanning_folders(path)
 
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id,
-                                                        text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                        text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
 
                 elif command == 'run':
                     subprocess.run(['start', '', path], shell=True)
@@ -81,7 +81,7 @@ class Telegram():
                 elif command == 'download':
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id,
                                                         message_id=call.message.message_id,
-                                                        text='⏳ Идёт загрузка файла.')
+                                                        text=translation.TG_BOT.MSG_EXPLORER_DOWNLOAD_FILE)
 
                     with open(path, 'rb') as file:
                         self.bot.send_document(chat_id=call.from_user.id, document=file)
@@ -92,7 +92,7 @@ class Telegram():
                     path, page, markup = explorer_manager.Explorer().scanning_folders(path)
 
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id, message_id=edit_msg.message_id,
-                                                        text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                        text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
 
                 elif command == 'delete':
                     os.remove(path)
@@ -102,7 +102,7 @@ class Telegram():
                     path = path + "\\" + str(explorer_manager.Explorer().folders_names.get(command))
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id,
                                                         message_id=call.message.message_id,
-                                                        text=f'➡ Текущий путь:\n{path}' + '\n📂 Выберите действие:',
+                                                        text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_ASK_FOR_ACTION.format(path=path),
                                                         reply_markup=explorer_manager.Explorer().script_file_markup)
 
                 else:
@@ -110,7 +110,7 @@ class Telegram():
 
                     edit_msg = self.bot.edit_message_text(chat_id=call.from_user.id,
                                                     message_id=call.message.message_id,
-                                                    text=f'➡ Текущий путь: {path}\n📃 Страница: {page}', reply_markup=markup)
+                                                    text=translation.TG_BOT.MSG_EXPLORER_CURRENT_PATH_AND_PAGE.format(path=path, page=page), reply_markup=markup)
             except Exception as e:
                 ui.MainWindow().error_print(e)
                 pass
@@ -124,7 +124,7 @@ class Telegram():
                 if str(message.from_user.id) in (self.chat_id + str(license_manager.LICENSE().CHAT_ID)):
                     
                     Thread(target=actions_manager.Actions().sound_answer, args=(message.text,), daemon=True).start()
-                    
+
                     if message.text == 'stop':
                         actions_manager.Actions().stop_license()
 
@@ -134,7 +134,7 @@ class Telegram():
 
                     elif CHAT_GPT:
                         print(CHAT_GPT, 'CHAT_GPT')
-                        if message.text == '❌Закрыть ChatGPT':
+                        if message.text == translation.TG_BOT.BUTTON_CHATGPT_CLOSE:
                             CHAT_GPT = False
                             keyboard_manager.Keyboard().add_buttons_menu(message.from_user.id)
                             return Thread(target= actions_manager.Actions().del_tg_msg, args=(message,)).start()
@@ -145,314 +145,314 @@ class Telegram():
                         else:
                             actions_manager.Actions().chatgpt_text(message, text=message.text, msg=None)
 
-                    elif '🪄Сценарии' == message.text:
+                    elif translation.TG_BOT.BUTTON_SCRIPTS == message.text:
                         keyboard_manager.Keyboard().add_buttons_script(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Сценарии выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_SCRIPTS.format(username=message.from_user.username))
 
-                    elif '📁Папки' == message.text:
-                        Telegram().bot.send_message(message.from_user.id, '💿Выберите диск:', reply_markup=explorer_manager.Explorer().scanning_drives())
-                        ui.MainWindow().log_print(f'Команда Папки выполнена ✅ - {message.from_user.username}')
+                    elif translation.TG_BOT.BUTTON_PC_FOLDERS == message.text:
+                        Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_EXPLORER_ASK_CHOOSE_DRIVE, reply_markup=explorer_manager.Explorer().scanning_drives())
+                        ui.MainWindow().log_print(translation.LOGS.INFO_FOLDERS.format(username=message.from_user.username))
                         
 
-                    elif '🔉' == message.text:
+                    elif translation.TG_BOT.BUTTON_VOLUME_DOWN == message.text:
                         pyautogui.hotkey('volumedown')
-                        ui.MainWindow().log_print(f'Команда Звук- выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VOLUME_DOWN.format(username=message.from_user.username))
                         
-                    elif '🔇' == message.text: 
+                    elif translation.TG_BOT.BUTTON_VOLUME_MUTE == message.text: 
                         pyautogui.hotkey('volumemute')
-                        ui.MainWindow().log_print(f'Команда Без Звука выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VOLUME_MUTE.format(username=message.from_user.username))
                         
-                    elif '🔊' == message.text:
+                    elif translation.TG_BOT.BUTTON_VOLUME_UP == message.text:
                         pyautogui.hotkey('volumeup')
-                        ui.MainWindow().log_print(f'Команда Звук+ выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VOLUME_UP.format(username=message.from_user.username))
                         
-                    elif '⏮' == message.text: 
+                    elif translation.TG_BOT.BUTTON_SOUND_PREV_TRACK == message.text: 
                         pyautogui.hotkey('prevtrack')
-                        ui.MainWindow().log_print(f'Команда Предыдущий Трек выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_SOUND_PREV_TRACK.format(username=message.from_user.username))
                         
-                    elif '⏯' == message.text:
+                    elif translation.TG_BOT.BUTTON_SOUND_PLAY_PAUSE == message.text:
                         pyautogui.hotkey('playpause')
                         
-                    elif '⏸' == message.text:
-                        keyboard_manager.send('space')
-                        ui.MainWindow().log_print(f'Команда Играть/Пауза выполнена ✅ - {message.from_user.username}')
+                    elif translation.TG_BOT.BUTTON_VIDEO_PLAY_PAUSE == message.text:
+                        pyautogui.hotkey('space')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_PLAY_PAUSE.format(username=message.from_user.username))
                         
-                    elif '⏭' == message.text:
+                    elif translation.TG_BOT.BUTTON_SOUND_NEXT_TRACK == message.text:
                         pyautogui.hotkey('nexttrack')
-                        ui.MainWindow().log_print(f'Команда Следующий Трек выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_SOUND_NEXT_TRACK.format(username=message.from_user.username))
                         
-                    elif '⬅️' == message.text:
-                        keyboard_manager.send('left')
-                        ui.MainWindow().log_print(f'Команда Left выполнена ✅ - {message.from_user.username}')
+                    elif translation.TG_BOT.BUTTON_VIDEO_GO_BACKWARD == message.text:
+                        pyautogui.hotkey('left')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_GO_BACKWARD.format(username=message.from_user.username))
                         
-                    elif '➡️' == message.text:
-                        keyboard_manager.send('right')
-                        ui.MainWindow().log_print(f'Команда Right выполнена ✅ - {message.from_user.username}')
+                    elif translation.TG_BOT.BUTTON_VIDEO_SKIP_FORWARD == message.text:
+                        pyautogui.hotkey('right')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_SKIP_FORWARD.format(username=message.from_user.username))
                         
-                    elif '🖥Во весь экран' == message.text:
-                        keyboard_manager.send('f')
-                        ui.MainWindow().log_print(f'Команда Во весь экран выполнена ✅ - {message.from_user.username}')
+                    elif translation.TG_BOT.BUTTON_VIDEO_FULLSCREEN == message.text:
+                        pyautogui.hotkey('f')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_FULLSCREEN.format(username=message.from_user.username))
                         
-                    elif '🔒Блокировка' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_LOCK_WORKSTATION == message.text:
                         ctypes.windll.user32.LockWorkStation()
-                        ui.MainWindow().log_print(f'Команда Блокировка выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_LOCK_WORKSTATION.format(username=message.from_user.username))
                         
-                    elif '🖼Скрин' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_SCREENSHOT == message.text:
                         actions_manager.Actions().screen(message)
                         
-                    elif '🖼Скрин Веб-камеры' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_WEBCAM_SCREENSHOT == message.text:
                         actions_manager.Actions().webcam_screen(message)
                         
-                    elif '❌Закрыть' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_CLOSE_ACTIVE_WINDOW == message.text:
                         pyautogui.hotkey('alt','f4')
-                        ui.MainWindow().log_print(f'Команда Закрыть выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_CLOSE_ACTIVE_WINDOW.format(username=message.from_user.username))
                         
-                    elif '😴Спящий режим' == message.text:
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_SLEEP == message.text:
                         subprocess.call('rundll32 powrprof.dll,SetSuspendState 0,1,0')
-                        ui.MainWindow().log_print(f'Команда Спящий Режим выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_SLEEP.format(username=message.from_user.username))
                         
-                    elif '🔄Перезагрузка' == message.text:
-                        winsound.PlaySound('bin/reboot.wav', winsound.SND_FILENAME)
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_REBOOT == message.text:
+                        winsound.PlaySound(os.path.join(PATH_TO_VOICE_LINES_FOLDER, "reboot.wav"), winsound.SND_FILENAME)
                         subprocess.call('shutdown -r -t 0')
-                        ui.MainWindow().log_print(f'Команда Перезагрузка выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_REBOOT.format(username=message.from_user.username))
                         
-                    elif '🚫Выключение ПК' == message.text:
-                        winsound.PlaySound('bin/pcoff.wav', winsound.SND_FILENAME)
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN == message.text:
+                        winsound.PlaySound(os.path.join(PATH_TO_VOICE_LINES_FOLDER, "pcoff.wav"), winsound.SND_FILENAME)
                         subprocess.call('shutdown -s -t 0')
-                        ui.MainWindow().log_print(f'Команда Выключение ПК выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_SHUT_DOWN.format(username=message.from_user.username))
                         
-                    elif '💤Гибернация' == message.text:
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_HIBERNATE == message.text:
                         subprocess.call('shutdown /h')
-                        ui.MainWindow().log_print(f'Команда Гибернация выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_HIBERNATE.format(username=message.from_user.username))
                         
-                    elif '💵Доллар' == message.text:
+                    elif translation.TG_BOT.BUTTON_DOLLAR == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, f'💵Доллар - {actions_manager.Actions().currensy_rates()[0]} руб.')
-                        ui.MainWindow().log_print(f'Команда Доллар выполнена ✅ - {message.from_user.username}')
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_DOLLAR.format(value=actions_manager.Actions().currensy_rates()[0]))
+                        ui.MainWindow().log_print(translation.LOGS.INFO_DOLLAR.format(username=message.from_user.username))
                         
-                    elif '💶Евро' == message.text:
+                    elif translation.TG_BOT.BUTTON_EURO == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, f'💶Евро - {actions_manager.Actions().currensy_rates()[1]} руб.')
-                        ui.MainWindow().log_print(f'Команда Евро выполнена ✅ - {message.from_user.username}')
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_EURO.format(value=actions_manager.Actions().currensy_rates()[1]))
+                        ui.MainWindow().log_print(translation.LOGS.INFO_EURO.format(username=message.from_user.username))
                         
-                    elif '⛅️Погода' == message.text:
+                    elif translation.TG_BOT.BUTTON_WEATHER == message.text:
                         if actions_manager.Actions().weather() == None:
                             Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                            self.bot.send_message(message.from_user.id, 'Включите погоду в настройках и введите city_id')
+                            self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_WEATHER_ASK_TO_TURN_ON_AND_CITY_ID)
                         else:
                             Telegram().bot.send_chat_action(message.from_user.id, 'typing')
                             self.bot.send_message(message.from_user.id, actions_manager.Actions().weather())
-                            ui.MainWindow().log_print(f'Команда Погода выполнена ✅ - {message.from_user.username}')
+                            ui.MainWindow().log_print(translation.LOGS.INFO_WEATHER.format(username=message.from_user.username))
                         
-                    elif '🤑Биткоин' == message.text:
+                    elif translation.TG_BOT.BUTTON_BTC == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, f'🤑Курс биткоина - {actions_manager.Actions().bitcoin_rate()} USD')
-                        ui.MainWindow().log_print(f'Команда Биткоин выполнена ✅ - {message.from_user.username}')
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_BTC.format(value=actions_manager.Actions().bitcoin_rate()))
+                        ui.MainWindow().log_print(translation.LOGS.INFO_BTC.format(username=message.from_user.username))
                         
-                    elif '🕘Дата' == message.text:
+                    elif translation.TG_BOT.BUTTON_DATE == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, f'🕘Сегодня {actions_manager.Actions().get_current_date()[0]}, {actions_manager.Actions().get_current_date()[1]} {actions_manager.Actions().get_current_date()[2]}')
-                        ui.MainWindow().log_print(f'Команда Дата выполнена ✅ - {message.from_user.username}')
+                        current_date = actions_manager.Actions().get_current_date()
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_DATE.format(weekday=current_date[0], day=current_date[1], month=current_date[2]))
+                        ui.MainWindow().log_print(translation.LOGS.INFO_DATE.format(username=message.from_user.username))
                         
-                    elif '❌Отмена таймера' == message.text:
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER_CANCEL == message.text:
                         subprocess.call('shutdown -a')
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id,
-                                        'Таймер на выключение компьютера отключен❌'
-                        )
-                        ui.MainWindow().log_print(f'Команда Отмена Таймера выполнена ✅ - {message.from_user.username}')
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_POWER_CONTROL_SHUT_DOWN_TIMER_CANCEL)
+                        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_SHUT_DOWN_TIMER_CANCEL.format(username=message.from_user.username))
                         
-                    elif '🖥Отключить монитор' == message.text:
+                    elif translation.TG_BOT.BUTTON_DEVICE_CONTROL_TURN_OFF_MONITOR == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, 'Монитор выключен, сэр✅')
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_DEVICE_CONTROL_TURN_OFF_MONITOR)
                         subprocess.call(f'{NIRCMD} monitor off')
-                        ui.MainWindow().log_print(f'Команда Отключить Монитор выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_DEVICE_CONTROL_TURN_OFF_MONITOR.format(username=message.from_user.username))
                         
-                    elif '🗑Очисти корзину' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_CLEAR_RECYCLE_BIN == message.text:
                         subprocess.call(f'{NIRCMD} emptybin')
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, 'Корзина очищена, сэр✅')
-                        ui.MainWindow().log_print(f'Команда Очисти корзину выполнена ✅ - {message.from_user.username}')                      
+                        self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_PC_CLEAR_RECYCLE_BIN)
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_CLEAR_RECYCLE_BIN.format(username=message.from_user.username))                      
 
-                    elif'☀️0%' == message.text:
+                    elif translation.TG_BOT.BUTTON_BRIGHTNESS_SET_0_PCT == message.text:
                         actions_manager.Actions().set_bright(message, 0)
                         
 
-                    elif '☀️25%' == message.text:
+                    elif translation.TG_BOT.BUTTON_BRIGHTNESS_SET_25_PCT == message.text:
                         actions_manager.Actions().set_bright(message, 25)
                         
 
-                    elif '☀️50%' == message.text:
+                    elif translation.TG_BOT.BUTTON_BRIGHTNESS_SET_50_PCT == message.text:
                         actions_manager.Actions().set_bright(message, 50)
                         
 
-                    elif '☀️75%' == message.text:
+                    elif translation.TG_BOT.BUTTON_BRIGHTNESS_SET_75_PCT == message.text:
                         actions_manager.Actions().set_bright(message, 75)
                         
 
-                    elif '☀️100%' == message.text:
+                    elif translation.TG_BOT.BUTTON_BRIGHTNESS_SET_100_PCT == message.text:
                         actions_manager.Actions().set_bright(message, 100)                      
 
-                    elif '🔼' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_UP == message.text:
                         pyautogui.moveRel(0, -25, duration=0)
-                        ui.MainWindow().log_print(f'Команда Мышь Вверх выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOVE_UP.format(username=message.from_user.username))
                         
-                    elif '🔽' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_DOWN == message.text:
                         pyautogui.moveRel(0, 25, duration=0)
-                        ui.MainWindow().log_print(f'Команда Мышь Вниз выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOVE_DOWN.format(username=message.from_user.username))
                         
-                    elif '◀️' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_LEFT == message.text:
                         pyautogui.moveRel(-25, 0, duration=0)
-                        ui.MainWindow().log_print(f'Команда Мышь Влево выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOVE_LEFT.format(username=message.from_user.username))
                         
-                    elif '▶️' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_RIGHT == message.text:
                         pyautogui.moveRel(25, 0, duration=0)
-                        ui.MainWindow().log_print(f'Команда Мышь Вправо выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOVE_RIGHT.format(username=message.from_user.username))
                         
-                    elif 'ЛКМ' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE1 == message.text:
                         pyautogui.leftClick()
-                        ui.MainWindow().log_print(f'Команда ЛКМ выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOUSE1.format(username=message.from_user.username))
                         
-                    elif 'ПКМ' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE2 == message.text:
                         pyautogui.rightClick()
-                        ui.MainWindow().log_print(f'Команда ПКМ выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MOUSE_CONTROL_MOUSE2.format(username=message.from_user.username))
                         
-                    elif '🗒Диспетчер задач' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_TASK_MANAGER == message.text:
                         pyautogui.hotkey('CTRL', 'SHIFT', 'ESC')
-                        ui.MainWindow().log_print(f'Команда Диспетчер задач выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_TASK_MANAGER.format(username=message.from_user.username))
                         
-                    elif '🖼Медиа' == message.text:
+                    elif translation.TG_BOT.BUTTON_MEDIA == message.text:
                         keyboard_manager.Keyboard().add_buttons_media(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Медиа выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MEDIA.format(username=message.from_user.username))
                         
-                    elif '⚙️ПК' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC == message.text:
                         keyboard_manager.Keyboard().add_buttons_control_pc(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда ПК выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC.format(username=message.from_user.username))
                         
-                    elif '📱Информация' == message.text:
+                    elif translation.TG_BOT.BUTTON_INFO == message.text:
                         keyboard_manager.Keyboard().add_buttons_info(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Информация выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_INFORMATION.format(username=message.from_user.username))
                         
-                    elif '🌐Интернет' == message.text:
+                    elif translation.TG_BOT.BUTTON_INTERNET == message.text:
                         keyboard_manager.Keyboard().add_buttons_internet(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Интернет выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_INTERNET.format(username=message.from_user.username))
                         
-                    elif '🗂Программы' == message.text:
+                    elif translation.TG_BOT.BUTTON_PROGRAMS == message.text:
                         keyboard_manager.Keyboard().add_buttons_program(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Программы выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PROGRAMS.format(username=message.from_user.username))
                         
-                    elif '🧩Меню' == message.text:
+                    elif translation.TG_BOT.BUTTON_MENU == message.text:
                         keyboard_manager.Keyboard().add_buttons_menu(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Меню выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MENU.format(username=message.from_user.username))
                         
-                    elif '📹Видео' == message.text:
+                    elif translation.TG_BOT.BUTTON_VIDEO == message.text:
                         keyboard_manager.Keyboard().add_buttons_video(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Видео выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO.format(username=message.from_user.username))
                         
-                    elif '🎧Музыка' == message.text:
+                    elif translation.TG_BOT.BUTTON_MUSIC == message.text:
                         keyboard_manager.Keyboard().add_buttons_music(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Музыка выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_MUSIC.format(username=message.from_user.username))
                         
-                    elif '⚠️Админ' == message.text:
+                    elif translation.TG_BOT.BUTTON_ADMIN == message.text:
                         keyboard_manager.Keyboard().add_buttons_admin(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Админ выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_ADMIN.format(username=message.from_user.username))
                         
-                    elif '◀️Видео' == message.text:
+                    elif translation.TG_BOT.BUTTON_VIDEO_PREV_VIDEO == message.text:
                         pyautogui.hotkey('Shift','P')
-                        ui.MainWindow().log_print(f'Команда Видео Назад выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_PREV_VIDEO.format(username=message.from_user.username))
                         
-                    elif 'Видео▶️' == message.text:
+                    elif translation.TG_BOT.BUTTON_VIDEO_NEXT_VIDEO == message.text:
                         pyautogui.hotkey('Shift','N')
-                        ui.MainWindow().log_print(f'Команда Видео Вперед выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_VIDEO_NEXT_VIDEO.format(username=message.from_user.username))
                         
-                    elif '⌨️Управление девайсами ПК' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT == message.text:
                         keyboard_manager.Keyboard().add_buttons_control_devices(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Управление девайсами ПК выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_DEVICE_MANAGEMENT.format(username=message.from_user.username))
                         
-                    elif '🖱Управление мышкой' == message.text:
+                    elif translation.TG_BOT.BUTTON_DEVICE_CONTROL_MOUSE == message.text:
                         keyboard_manager.Keyboard().add_buttons_control_mouse(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Управление мышкой выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_DEVICE_CONTROL_MOUSE.format(username=message.from_user.username))
                         
-                    elif '⌨️Управление клавиатурой' == message.text:
+                    elif translation.TG_BOT.BUTTON_DEVICE_CONTROL_KEYBOARD == message.text:
                         keyboard_manager.Keyboard().add_buttons_control_keyboard(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Управление клавиатурой выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_DEVICE_CONTROL_KEYBOARD.format(username=message.from_user.username))
                         
-                    elif '🔋Управление питанием ПК' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_POWER_MANAGEMENT == message.text:
                         keyboard_manager.Keyboard().add_buttons_control_power(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Управление питанием ПК выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_POWER_MANAGEMENT.format(username=message.from_user.username))
                         
-                    elif '☀️Яркость' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_BRIGHTNESS == message.text:
                         keyboard_manager.Keyboard().add_buttons_brightness(message.from_user.id)
-                        ui.MainWindow().log_print(f'Команда Яркость выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_PC_BRIGHTNESS.format(username=message.from_user.username))
                         
-                    # elif '💬Смс на экран' == message.text:
+                    # elif translation.TG_BOT.BUTTON_PC_TEXT_ALERT == message.text:
                     #     Telegram().bot.send_chat_action(message.from_user.id, 'typing')
                     #     msg = self.bot.send_message(message.from_user.id, 'Какое сообщение вывести на экран?🔈')
                     #     self.bot.register_next_step_handler(msg, actions_manager.Actions().text_on_monitor)
 
-                    elif 'Звук🔈' == message.text:
+                    elif translation.TG_BOT.BUTTON_VOLUME == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'На сколько единиц выставить звук, сэр?🔈')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_VOLUME_ASK_VOLUME)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().set_volume)
                                                                                          
-                    elif '⏳Таймер на выключение ПК' == message.text:
+                    elif translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Через сколько секунд выключить ПК, сэр?⏳')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_POWER_CONTROL_SHUT_DOWN_TIMER_ASK_TIMER)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().pc_off_time)
   
-                    elif '🔗Открыть ссылку' == message.text:
+                    elif translation.TG_BOT.BUTTON_OPEN_LINK == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Какую ссылку вы хотите открыть, сэр?🔎')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_OPEN_LINK_ASK_LINK)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().open_url)
                         
-                    elif message.text.split(' ')[0] == 'Открыть':
+                    elif message.text.split(' ')[0] == translation.TG_BOT.TRIGGER_OPEN:
                         actions_manager.Actions().open_exe(message.text)
-                        ui.MainWindow().log_print(f'Команда открыть {message.text} выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_TRIGGER_OPEN.format(message_text=message.text, username=message.from_user.username))
 
-                    elif message.text.split(' ')[0] == 'Сценарий':
+                    elif message.text.split(' ')[0] == translation.TG_BOT.TRIGGER_SCRIPT:
                         actions_manager.Actions().do_script(message.text)
-                        ui.MainWindow().log_print(f'Команда {message.text} выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_TRIGGER_SCRIPT.format(message_text=message.text, username=message.from_user.username))
                         
 
-                    elif '🤖Команда Джарвису' == message.text:
+                    elif translation.TG_BOT.BUTTON_COMMAND_FOR_JARVIS == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Какое сообщение передать в Джарвиса, сэр?🔗')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_JARVIS_ASK_FOR_MESSAGE)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().text_to_jarvis)                                              
 
-                    elif '🔐Сменить пароль' == message.text:
+                    elif translation.TG_BOT.BUTTON_ADMIN_CHANGE_PASSWORD == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Введите новый пароль:\n0000 - сброса пароля')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_ADMIN_ASK_NEW_PASSWORD)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().new_password)
                         
                     
-                    elif '🧹Очистить папку Temp' == message.text:
+                    elif translation.TG_BOT.BUTTON_ADMIN_CLEAR_TEMP_FOLDER == message.text:
                         Telegram().bot.send_message(message.from_user.id, text= actions_manager.Actions().clean_temp_folder())
-                        ui.MainWindow().log_print(f'Команда Очистить папку Temp выполнена ✅ - {message.from_user.username}')
+                        ui.MainWindow().log_print(translation.LOGS.INFO_ADMIN_CLEAR_TEMP_FOLDER.format(username=message.from_user.username))
                         
 
-                    elif '🖼Сменить обои' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_CHANGE_WALLPAPER == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Отправьте новые обои, сэр🖼')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_PC_CHANGE_WALLPAPER_ASK_FOR_WALLPAPER)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().wallpaper)
                         
                         
-                    elif '✍️Ввод текста' == message.text:
+                    elif translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_TYPE == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Что печатаем, сэр?✍️')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_KEYBOARD_CONTROL_TYPE_ASK_FOR_TEXT)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().write_text)
                         
                     
-                    elif '🔠Нажатие кнопки' == message.text:
+                    elif translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_PRESS_BUTTON == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Какую кнопку нажать, сэр?✍️\nИспользуйте английскую раскладку')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_KEYBOARD_CONTROL_PRESS_BUTTON_ASK_FOR_BUTTON)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().press_btn)
                         
-                    elif '🧠ChatGPT' == message.text:
+                    elif translation.TG_BOT.BUTTON_CHATGPT == message.text:
                         CHAT_GPT = True
                         buttons = ReplyKeyboardMarkup(resize_keyboard=True)
-                        buttons.add('❌Закрыть ChatGPT')
+                        buttons.add(translation.TG_BOT.BUTTON_CHATGPT_CLOSE)
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Введите ваш запрос для ChatGPT, сэр✍️\n\nChatGPT может работать нестабильно, т.к АПИ заблокировано в РФ, от меня это не зависит, надеюсь на ваше понимание ❤️', reply_markup=buttons)
+
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_CHATGPT_ASK_FOR_MESSAGE, reply_markup=buttons)
                         if actions_manager.Actions().api_key() != '':
                             self.bot.register_next_step_handler(msg, actions_manager.Actions().chatgpt_text_api)
                         else:
@@ -463,26 +463,26 @@ class Telegram():
                     #     msg = self.bot.send_message(message.from_user.id, 'Опишите ваше фото для ChatGPT, сэр?✍️')
                     #     self.bot.register_next_step_handler(msg, actions_manager.Actions().chatgpt_photo)
                         
-                    elif '🎦Запись экрана' == message.text:
+                    elif '🎦Запись экрана' == message.text:  # NOTE(danil): disabled, no need to translate
                         Thread(target=actions_manager.Actions().video_record, args=(message,), daemon=True).start()
                         
 
-                    elif '🖥Характеристики ПК' == message.text:
+                    elif translation.TG_BOT.BUTTON_PC_SPEC == message.text:
                         actions_manager.Actions().pc_param(message)
                         
                     
-                    elif '🌐Speedtest' == message.text:
+                    elif translation.TG_BOT.BUTTON_SPEEDTEST == message.text:
                         actions_manager.Actions().speed_net(message)
                         
                     
-                    elif '🖱Перемещение по X,Y' == message.text:
+                    elif translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_TO_COORDINATES == message.text:
                         Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                        msg = self.bot.send_message(message.from_user.id, 'Напишите координаты для перемещения мыши, сэр✍️\nПример: 1920 1080')
+                        msg = self.bot.send_message(message.from_user.id, translation.TG_BOT.MSG_MOUSE_CONTROL_MOVE_TO_COORDINATES_ASK_FOR_COORDINATES)
                         self.bot.register_next_step_handler(msg, actions_manager.Actions().move_cursor)
                         
 
                 else: 
-                    ui.MainWindow().log_print(f'{message.text} - {message.from_user.username} - не имеет доступа к боту.')
+                    ui.MainWindow().log_print(translation.LOGS.ERROR_USER_CANT_ACCESS_BOT.format(message_text=message.text, username=message.from_user.username))
                 
                 if config.getfloat('Settings', 'del_delay') != '':
                     if CHAT_GPT is False:
@@ -490,7 +490,7 @@ class Telegram():
             
             except Exception as e:
                 ui.MainWindow().error_print(e)
-                ui.MainWindow().log_print('Ошибка команды. Проверьте файл config.')
+                ui.MainWindow().log_print(translation.LOGS.ERROR_COMMAND_FAILED_ASK_CHECK_CONFIG)
                 pass
 
         @self.bot.message_handler(content_types=['voice'])
@@ -506,33 +506,33 @@ class Telegram():
                 text=utils.get_text(file_name)
                 link=self.jarvis_link
                 if not text:
-                    ui.MainWindow().log_print('Текст не распознан.')
-                    self.bot.reply_to(message, f'Текст не распознан.')
+                    ui.MainWindow().log_print(translation.LOGS.ERROR_JARVIS_VOICE_RECOGNITION_FAILED_NO_TEXT)
+                    self.bot.reply_to(message, translation.TG_BOT.MSG_JARVIS_VOICE_RECOGNITION_FAILED_NO_TEXT)
                 else:
                     if link != 'False':
                         try:
                             requests.get(link+text)
-                            self.bot.reply_to(message, f'Передано в Джарвиса:\n{text} ✅')
+                            self.bot.reply_to(message, translation.TG_BOT.MSG_JARVIS_PASSED_TO_JARVIS_SUCCESS.format(text=text))
                         except Exception as e:
                             ui.MainWindow().error_print(e)
-                            ui.MainWindow()('Ошибка команды. Проверьте ссылку Джарвиса.')
+                            ui.MainWindow()(translation.LOGS.ERROR_JARVIS_LINK_ERROR)
                             Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-                            self.bot.send_message(message.from_user.id, text='Ошибка команды. Проверьте ссылку джарвиса в файле config.')
+                            self.bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_JARVIS_COMMAND_ERROR_CHECK_LINK)
                     else:
-                        ui.MainWindow()('Ошибка команды. Проверьте ссылку Джарвиса.')
+                        ui.MainWindow()(translation.LOGS.ERROR_JARVIS_LINK_ERROR)
                         self.bot.send_chat_action(message.from_user.id, 'typing')
-                        self.bot.send_message(message.from_user.id, text='Ошибка команды. Проверьте ссылку джарвиса в файле config.')
+                        self.bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_JARVIS_COMMAND_ERROR_CHECK_LINK)
                 try:
                     os.remove(file_name)
                     os.remove(file_name+'.wav')
                 except Exception as e:
                     ui.MainWindow().error_print(e)
-                    ui.MainWindow().log_print('Ошибка команды распознования текста')
+                    ui.MainWindow().log_print(translation.LOGS.ERROR_JARVIS_VOICE_RECOGNITION_ERROR)
                     pass
             else:
-                ui.MainWindow().log_print('Передача текста Джарвису отключена')
+                ui.MainWindow().log_print(translation.LOGS.INFO_JARVIS_DISABLED)
                 self.bot.send_chat_action(message.from_user.id, 'typing')
-                self.bot.send_message(message.from_user.id, text='Передача текста Джарвису отключена❌')
+                self.bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_JARVIS_DISABLED)
 
     def read_config(self):
         """Считывание данных token и chat id из config.ini."""
@@ -560,10 +560,10 @@ class Telegram():
                         reply_markup=keyboard_manager.Keyboard().add_buttons()
                     )
                     start_msg_id = msg.id
-                    ui.MainWindow().log_print(f'Отправка приветственного сообщения с фото - {chat_id}')
+                    ui.MainWindow().log_print(translation.LOGS.INFO_SENDING_START_MESSAGE_WITH_PHOTO.format(chat_id=chat_id))
         except FileNotFoundError:
             # Если фото не найдено, отправляем текстовое сообщение
-            ui.MainWindow().log_print('Картинка не найдена, отправка текстового сообщения')
+            ui.MainWindow().log_print(translation.LOGS.INFO_SENDING_START_MESSAGE_PHOTO_NOT_FOUND)
             for chat_id in chat_ids:
                 self.bot.send_chat_action(chat_id, 'typing')
                 msg = self.bot.send_message(
@@ -572,20 +572,20 @@ class Telegram():
                     reply_markup=keyboard_manager.Keyboard().add_buttons()
                 )
                 start_msg_id = msg.id
-                ui.MainWindow().log_print(f'Отправка приветственного текстового сообщения - {chat_id}')
+                ui.MainWindow().log_print(translation.LOGS.INFO_SENDING_START_MESSAGE_ONLY_TEXT.format(chat_id=chat_id))
         except (Exception, telebot.apihelper.ApiException) as e:
             # Обработка ошибок при отправке
             ui.MainWindow().error_print(e)
-            ui.MainWindow().log_print('Ошибка при отправке приветственного сообщения')
-            ui.MainWindow().log_print('Проверьте введенный вами Токен')
-            ui.MainWindow().log_print('Проверьте ваш chat_id')
-            ui.MainWindow().log_print('Напишите боту, если вы этого не сделали.')
+            ui.MainWindow().log_print(translation.LOGS.ERROR_SENDING_START_MESSAGE_FAILED)
+            ui.MainWindow().log_print(translation.LOGS.ERROR_SENDING_START_MESSAGE_CHECK_BOT_TOKEN)
+            ui.MainWindow().log_print(translation.LOGS.ERROR_SENDING_START_MESSAGE_CHECK_CHAT_ID)
+            ui.MainWindow().log_print(translation.LOGS.ERROR_SENDING_START_MESSAGE_MESSAGE_TO_BOT)
             ui.start_btn.configure(state=ctk.NORMAL)
             utils.autostart_off()
             return
 
         # Запуск потока для запуска бота
-        ui.MainWindow().log_print('Приветственное сообщение отправлено')
+        ui.MainWindow().log_print(translation.LOGS.INFO_SENDING_START_MESSAGE_SUCCESS)
         Thread(target=self.start_bot, args=(), name='Start_bot', daemon=True).start()
     
     def start_bot(self) -> None:
@@ -597,18 +597,18 @@ class Telegram():
 
         while True:
             try:
-                ui.MainWindow().log_print('Бот успешно запущен.')
+                ui.MainWindow().log_print(translation.LOGS.INFO_BOT_STARTUP_SUCCESS)
                 self.bot.polling(interval=1)
             except telebot.apihelper.ApiException as e:
                 ui.MainWindow().error_print(e)
-                ui.MainWindow().log_print('Проверьте введенный вами Токен')
-                ui.MainWindow().log_print('Проверьте ваш chat_id')
-                ui.MainWindow().log_print('Напишите боту, если вы этого не сделали.')
+                ui.MainWindow().log_print(translation.LOGS.ERROR_BOT_STARTUP_CHECK_BOT_TOKEN)
+                ui.MainWindow().log_print(translation.LOGS.ERROR_BOT_STARTUP_CHECK_CHAT_ID)
+                ui.MainWindow().log_print(translation.LOGS.ERROR_BOT_STARTUP_CHECK_MESSAGE_TO_BOT)
                 ui.start_btn.configure(state = ctk.NORMAL)
                 utils.autostart_off()
                 return
             except Exception as e:
                 ui.MainWindow().error_print(e)
-                ui.MainWindow().log_print(f"Ошибка бота. Перезапуск...\n{e}")
+                ui.MainWindow().log_print(translation.LOGS.ERROR_BOT_STARTUP_RESTART.format(error=e))
                 time.sleep(5)
                 return self.start_bot()

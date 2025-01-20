@@ -4,6 +4,8 @@ import os
 import psutil
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 
+from config_manager import translation
+
 
 class Explorer():
     global edit_msg, path, page, all_path
@@ -39,7 +41,7 @@ class Explorer():
 
         # Создаем маркап с дисками
         drives_markup = InlineKeyboardMarkup(row_width=5).add(*self.drives_in)
-        drives_markup.add(InlineKeyboardButton('🏚Рабочий стол', callback_data='desktop'))
+        drives_markup.add(InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_DESKTOP, callback_data='desktop'))
         return drives_markup
 
 
@@ -110,8 +112,8 @@ class Explorer():
         folders_markup = InlineKeyboardMarkup(row_width=2).add(*inline_folders)
 
         # Создаем кнопки для переключения между страницами
-        previous_button = InlineKeyboardButton('◀ Предыдущая страница', callback_data='previous_page')
-        next_button = InlineKeyboardButton('Следующая страница ▶', callback_data='next_page')
+        previous_button = InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_PREV_PAGE, callback_data='previous_page')
+        next_button = InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_NEXT_PAGE, callback_data='next_page')
 
         # Добавляем кнопки в маркап
         if page == 1 and pages > 1:
@@ -127,11 +129,11 @@ class Explorer():
         path = path.replace('None', '')
 
         if self.comparison_path(path):
-            go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
+            go_back_to_drives = InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_BACK_TO_DRIVES, callback_data='back_to_drives')
             folders_markup.row(go_back_to_drives)
         else:
-            go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
-            go_back_explorer = InlineKeyboardButton('◀ Назад', callback_data='back_explorer')
+            go_back_to_drives = InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_BACK_TO_DRIVES, callback_data='back_to_drives')
+            go_back_explorer = InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_BACK, callback_data='back_explorer')
             folders_markup.row(go_back_explorer, go_back_to_drives)
 
         return all_path, page, folders_markup
@@ -159,9 +161,9 @@ class Explorer():
         return False
 
 
-    script_file_btns = [InlineKeyboardButton('🖥 Запустить', callback_data='run'),
-                        InlineKeyboardButton('📲 Скачать', callback_data='download'),
-                        InlineKeyboardButton('🗑 Удалить', callback_data='delete'),
-                        InlineKeyboardButton('◀ Назад', callback_data='back_explorer')]
+    script_file_btns = [InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_RUN, callback_data='run'),
+                        InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_DOWNLOAD, callback_data='download'),
+                        InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_DELETE, callback_data='delete'),
+                        InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_BACK, callback_data='back_explorer')]
 
     script_file_markup = InlineKeyboardMarkup(row_width=1).add(*script_file_btns)

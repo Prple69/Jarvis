@@ -6,30 +6,9 @@ import customtkinter as ctk
 from win32com.client import Dispatch
 import ui
 import speech_recognition as sr
-import configparser
 
-def create_if_not_exist_config():
-    config=configparser.ConfigParser()
-    if not os.path.isfile('config.ini'):
-        config.add_section('Settings')
-        config.set('Settings', 'token', '')
-        config.set('Settings', 'chat_id', '')
-        config.set('Settings', 'date', 'False')
-        config.set('Settings', 'time', 'False')
-        config.set('Settings', 'usd', 'False')
-        config.set('Settings', 'eur', 'False')
-        config.set('Settings', 'btc', 'False')
-        config.set('Settings', 'weather', 'False')
-        config.set('Settings', 'city_id', ' ')
-        config.set('Settings', 'voice_greet', 'False')
-        config.set('Settings', 'jarvis', 'False')
-        config.set('Settings', 'jarvis_link', ' ')
-        config.set('Settings', 'autostart', 'False')
-        config.set('Settings', 'gpt_api', ' ')
-        config.set('Settings', 'del_delay', '3')
-        config.set('Settings', 'photo', f'{os.path.abspath("bin/PC_Started.png")}')
-        with open('config.ini', 'w+', encoding='utf-8') as f:
-            config.write(f)
+from config_manager import translation
+
 
 def quit_window():
     ui.MainWindow().root.destroy()
@@ -50,8 +29,8 @@ def withdraw_window():
 
 def start_icon():
     image = Image.open(os.path.abspath(r'bin/icon.ico'), 'r')
-    menu=(item('Показать', show_window), item('Закрыть', quit_window))
-    icon = Icon('Pc Control', image, menu=menu)
+    menu=(item(translation.UI.START_ICON_SHOW, show_window), item(translation.UI.START_ICON_CLOSE, quit_window))
+    icon = Icon(translation.UI.START_ICON_TITLE, image, menu=menu)
     icon.run()
 
 def get_text(filepath):
@@ -63,7 +42,7 @@ def get_text(filepath):
         harvard = sr.AudioFile(filepath+'.wav')
         with harvard as source:
             audio = r.record(source)
-        return(r.recognize_google(audio,language='ru_RU')) # тут можешь поменять язык распознавания, если уберешь то англ
+        return(r.recognize_google(audio,language=translation.UI.JARVIS_VOICE_RECOGNITION_LANGUAGE)) # тут можешь поменять язык распознавания, если уберешь то англ
     except Exception as e:
         ui.MainWindow().error_print(e)
         pass

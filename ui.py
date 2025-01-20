@@ -14,11 +14,23 @@ from screeninfo import get_monitors
 
 import actions_manager
 import bot_manager
-from config_manager import BOT_INFO, BOT_LICENSE
+from config_manager import BOT_INFO, BOT_LICENSE, translation
 import license_manager
 import main
+from constants import UIScriptsButtons
 import utils
 
+
+VALUES_TO_LABELS = {
+    translation.UI.SCRIPT_NAME_CURSOR_TO_COORDINATES: UIScriptsButtons.CURSOR_TO_XY, 
+    translation.UI.SCRIPT_NAME_LAUNCH_PROGRAM: UIScriptsButtons.OPEN_PROGRAM, 
+    translation.UI.SCRIPT_NAME_CLOSE_PROGRAM: UIScriptsButtons.CLOSE_PROGRAM,
+    translation.UI.SCRIPT_NAME_OPEN_WEBSITE: UIScriptsButtons.OPEN_WEBSITE,
+    translation.UI.SCRIPT_NAME_WAIT: UIScriptsButtons.WAIT,
+    translation.UI.SCRIPT_NAME_KEYBOARD_SHORTCUT: UIScriptsButtons.KEYBOARD_SHORTCUT,
+    translation.UI.SCRIPT_NAME_TYPE_TEXT: UIScriptsButtons.TYPE_TEXT,
+    translation.UI.SCRIPT_NAME_PRESS_MOUSE_BUTTON: UIScriptsButtons.PRESS_MOUSE_BUTTON,
+}
 
 class MainWindow():
     """Класс дизайна."""
@@ -26,7 +38,7 @@ class MainWindow():
     ctk.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
     root = ctk.CTk()
     root.geometry('550x320')
-    root.title('Pc control | By Purple // tg: @prpleprog')
+    root.title(translation.UI.TITLE)
     root.resizable(False, False)
     bg = '#18191d'
     fg = '#2b2b2b'
@@ -126,7 +138,7 @@ class MainWindow():
         bot_page.pack_propagate(False)
         bot_page.pack()
         # Строка - Введите токен бота.
-        token_lbl = ctk.CTkLabel(bot_page, text='Введите токен бота', font=('Bold',18))
+        token_lbl = ctk.CTkLabel(bot_page, text=translation.UI.INPUT_BOT_TOKEN, font=('Bold',18))
         token_lbl.pack()
         token_lbl.place(x=10, y=5)
         # Ввод токена бота.
@@ -135,7 +147,7 @@ class MainWindow():
         token_entry.place(x=10, y=33)
         token_entry.bind('<KeyRelease>', self.save_data_bot)
         # Строка - Введите чат айди.
-        city_id_lbl = ctk.CTkLabel(bot_page, text='Введите чат айди', font=('Bold',18))
+        city_id_lbl = ctk.CTkLabel(bot_page, text=translation.UI.INPUT_CHAT_ID, font=('Bold',18))
         city_id_lbl.pack()
         city_id_lbl.place(x=10, y=76)
         # Ввод чат айди.
@@ -159,28 +171,30 @@ class MainWindow():
         global script_page, FLAG
         self.delete_pages()
         FLAG = False
-        
-        VALUES = [
-            'Курсор по X,Y', 
-            'Открытие программы', 
-            'Закрытие программы',
-            'Открыть сайт',
-            'Подождать',
-            'Cочетание клавиш',
-            'Напечатать текст',
-            'Нажать кнопку мыши',
-            ]
 
+        # NOTE(danil): keys - for developers, values for user (to keep the same format for each language)
+
+        LABELS_TO_VALUES = {
+            UIScriptsButtons.CURSOR_TO_XY: translation.UI.SCRIPT_NAME_CURSOR_TO_COORDINATES, 
+            UIScriptsButtons.OPEN_PROGRAM: translation.UI.SCRIPT_NAME_LAUNCH_PROGRAM, 
+            UIScriptsButtons.CLOSE_PROGRAM: translation.UI.SCRIPT_NAME_CLOSE_PROGRAM,
+            UIScriptsButtons.OPEN_WEBSITE: translation.UI.SCRIPT_NAME_OPEN_WEBSITE,
+            UIScriptsButtons.WAIT: translation.UI.SCRIPT_NAME_WAIT,
+            UIScriptsButtons.KEYBOARD_SHORTCUT: translation.UI.SCRIPT_NAME_KEYBOARD_SHORTCUT,
+            UIScriptsButtons.TYPE_TEXT: translation.UI.SCRIPT_NAME_TYPE_TEXT,
+            UIScriptsButtons.PRESS_MOUSE_BUTTON: translation.UI.SCRIPT_NAME_PRESS_MOUSE_BUTTON,
+        }
+        
         ARGS_DICT = {
-            'Курсор по X,Y': 'Координаты X, Y',
-            'Открытие программы':'Путь до программы',
-            'Закрытие программы':'Имя процесса',
-            'Открыть сайт':'Ссылка',
-            'Подождать':'Время в секундах',
-            'Cочетание клавиш':'Ctrl+Shift+Delete',
-            'Напечатать текст':'Привет, я @prpleprog',
-            'Нажать кнопку мыши':'ЛКМ, ПКМ, СКМ'
-            }
+            UIScriptsButtons.CURSOR_TO_XY: translation.UI.SCRIPT_PLACEHOLDER_CURSOR_TO_COORDINATES,
+            UIScriptsButtons.OPEN_PROGRAM: translation.UI.SCRIPT_PLACEHOLDER_LAUNCH_PROGRAM,
+            UIScriptsButtons.CLOSE_PROGRAM: translation.UI.SCRIPT_PLACEHOLDER_CLOSE_PROGRAM,
+            UIScriptsButtons.OPEN_WEBSITE: translation.UI.SCRIPT_PLACEHOLDER_OPEN_WEBSITE,
+            UIScriptsButtons.WAIT: translation.UI.SCRIPT_PLACEHOLDER_WAIT,
+            UIScriptsButtons.KEYBOARD_SHORTCUT: translation.UI.SCRIPT_PLACEHOLDER_KEYBOARD_SHORTCUT,
+            UIScriptsButtons.TYPE_TEXT: translation.UI.SCRIPT_PLACEHOLDER_TYPE_TEXT,
+            UIScriptsButtons.PRESS_MOUSE_BUTTON: f"{translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE1}, {translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE2}, {translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE3}"
+        }
         
         script_page = ctk.CTkScrollableFrame(main_frame, orientation = 'vertical')
         script_page.configure(width=410, height=250, corner_radius=5, fg_color=self.fg)
@@ -221,9 +235,9 @@ class MainWindow():
                     
                     #Добавляю имена, строки и их айди по строчно в словарь, дабы правильно удалять их
                     entry_dict = {
-                    'edit': edit_photo,
-                    'prog': prog_name_lbl,
-                    'index': programm['id']
+                        'edit': edit_photo,
+                        'prog': prog_name_lbl,
+                        'index': programm['id']
                     }
 
                     entry_list.append(entry_dict)
@@ -232,7 +246,7 @@ class MainWindow():
             
             #Кнопка - добавление строк
             add_photo = ctk.CTkImage(Image.open('bin/plus.png'), size=(30,30))
-            add_button = ctk.CTkButton(script_page, width=390, height=0, text='Новый сценарий', font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, command= lambda: load_editor(id=None))
+            add_button = ctk.CTkButton(script_page, width=390, height=0, text=translation.UI.BUTTON_NEW_SCRIPT, font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, command= lambda: load_editor(id=None))
             add_button.grid(row=row+1, columnspan=3, pady = (0,0), sticky='nsew')
         
         def show_cord(path, args_list, id) -> None:
@@ -270,13 +284,13 @@ class MainWindow():
 
         def select_file_script(path, args_list, id) -> None:
             filetypes = (
-            ('All files', '*.*'),
-            ('Text files', '*.txt'),
-            ('Exe files', '*.exe')
+                ('All files', '*.*'),
+                ('Text files', '*.txt'),
+                ('Exe files', '*.exe')
             )
 
             filename = ctk.filedialog.askopenfilename(
-                title='Выберите файл',
+                title=translation.UI.CHOOSE_FILE,
                 initialdir= os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') ,
                 filetypes=filetypes)
             path.delete(0, 'end')
@@ -298,13 +312,13 @@ class MainWindow():
             editor_page.rowconfigure(index=tuple(range(100)),weight=6)
             
             #Ввод имени сценария
-            prog_name_entry = ctk.CTkEntry(menu_frame, width=150, placeholder_text='Имя сценария')
+            prog_name_entry = ctk.CTkEntry(menu_frame, width=150, placeholder_text=translation.UI.SCRIPT_PLACEHOLDER_TITLE)
             prog_name_entry.grid(row=0, column=0, pady=3, padx=(3,3))
             
             #Выбор функции
             variable = ctk.StringVar()
-            variable.set('Действие')
-            choose_act_tab = ctk.CTkOptionMenu(menu_frame, variable=variable, width=150, font=(None, 12), values=VALUES)
+            variable.set(translation.UI.ACTION)
+            choose_act_tab = ctk.CTkOptionMenu(menu_frame, variable=variable, width=150, font=(None, 12), values=list(VALUES_TO_LABELS.keys()))
             choose_act_tab.grid(row=0, column=1, pady=3, padx=(3,3))
             
             #Кнопка назад - вовзращает к списку сценариев
@@ -325,14 +339,14 @@ class MainWindow():
                         if len(script['commands']) !=0:
                             for idx, func in enumerate(dict(script['commands'])):
                                 editor_page.rowconfigure(index=index, weight=5)
-                                name = script['commands'][func][0]
+                                name = script['commands'][func][0]  # NOTE(danil): name should be one of UIScriptsButtons values
                                 args = script['commands'][func][1]
                                 
                                 arrow_up_photo = ctk.CTkImage(Image.open('bin/arrow_up.png'), size=(15,15))
                                 arrow_down_photo = ctk.CTkImage(Image.open('bin/arrow_down.png'), size=(15,15))
                                 arrow_up_btn = ctk.CTkButton(editor_page, width=0, height=0, image=arrow_up_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='', textvariable='up')
                                 arrow_down_btn = ctk.CTkButton(editor_page, width=0, height=0, image=arrow_down_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='', textvariable='down')
-                                arg_lbl = ctk.CTkLabel(editor_page, text=name)
+                                arg_lbl = ctk.CTkLabel(editor_page, text=LABELS_TO_VALUES[name])
                                 arg_entry = ctk.CTkEntry(editor_page, placeholder_text=ARGS_DICT[name])
                                 select_photo = ctk.CTkImage(Image.open('bin/select.png'), size=(15,15))
                                 select_button = ctk.CTkButton(editor_page, width=0, height=0, image=select_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='')
@@ -345,11 +359,11 @@ class MainWindow():
                                         arg_lbl.grid(row=index, column=2, pady=5, padx=(3, 3))
                                         arg_entry.insert(ctk.INSERT, args)
                                         arg_entry.grid(row=index, column=3, pady=5, padx=(3,6))
-                                        if name in ('Курсор по X,Y', 'Открытие программы'):
+                                        if name in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                                             select_button.grid(row=index, column=4, pady=5)
-                                            if name == 'Открытие программы':
+                                            if name == UIScriptsButtons.OPEN_PROGRAM:
                                                 select_button.configure(command = lambda arg_entry=arg_entry: select_file_script(arg_entry, args_list, id))
-                                            elif name == 'Курсор по X,Y':
+                                            elif name == UIScriptsButtons.CURSOR_TO_XY:
                                                 select_button.configure(command = lambda arg_entry=arg_entry: show_cord(arg_entry, args_list, id))
                                         delete_button.grid(row=index, column=5, padx=(3,0))
                                         delete_button.configure(command= lambda 
@@ -368,11 +382,11 @@ class MainWindow():
                                         arg_lbl.grid(row=index, column=2, pady=5, padx=(3, 3))
                                         arg_entry.insert(ctk.INSERT, args)
                                         arg_entry.grid(row=index, column=3, pady=5, padx=(3,6))
-                                        if name in ('Курсор по X,Y', 'Открытие программы'):
+                                        if name in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                                             select_button.grid(row=index, column=4, pady=5)
-                                            if name == 'Открытие программы':
+                                            if name == UIScriptsButtons.OPEN_PROGRAM:
                                                 select_button.configure(command = lambda arg_entry=arg_entry: select_file_script(arg_entry, args_list, id))
-                                            elif name == 'Курсор по X,Y':
+                                            elif name == UIScriptsButtons.CURSOR_TO_XY:
                                                 select_button.configure(command = lambda arg_entry=arg_entry: show_cord(arg_entry, args_list, id))
                                         delete_button.grid(row=index, column=5, padx=(3,0))
                                         delete_button.configure(command= lambda 
@@ -385,11 +399,11 @@ class MainWindow():
                                     arg_lbl.grid(row=index, column=2, pady=5, padx=(3, 3))
                                     arg_entry.insert(ctk.INSERT, args)
                                     arg_entry.grid(row=index, column=3, pady=5, padx=(3,6))
-                                    if name in ('Курсор по X,Y', 'Открытие программы'):
+                                    if name in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                                         select_button.grid(row=index, column=4, pady=5)
-                                        if name == 'Открытие программы':
+                                        if name == UIScriptsButtons.OPEN_PROGRAM:
                                             select_button.configure(command = lambda arg_entry=arg_entry: select_file_script(arg_entry, args_list, id))
-                                        elif name == 'Курсор по X,Y':
+                                        elif name == UIScriptsButtons.CURSOR_TO_XY:
                                             select_button.configure(command = lambda arg_entry=arg_entry: show_cord(arg_entry, args_list, id))
                                     delete_button.grid(row=index, column=5, padx=(3,0))
                                     delete_button.configure(command= lambda 
@@ -410,11 +424,11 @@ class MainWindow():
                                     arg_lbl.grid(row=index, column=2, pady=5, padx=(3, 3))
                                     arg_entry.insert(ctk.INSERT, args)
                                     arg_entry.grid(row=index, column=3, pady=5, padx=(3,6))
-                                    if name in ('Курсор по X,Y', 'Открытие программы'):
+                                    if name in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                                         select_button.grid(row=index, column=4, pady=5)
-                                        if name == 'Открытие программы':
+                                        if name == UIScriptsButtons.OPEN_PROGRAM:
                                             select_button.configure(command = lambda arg_entry=arg_entry: select_file_script(arg_entry, args_list, id))
-                                        elif name == 'Курсор по X,Y':
+                                        elif name == UIScriptsButtons.CURSOR_TO_XY:
                                             select_button.configure(command = lambda arg_entry=arg_entry: show_cord(arg_entry, args_list, id))
                                     delete_button.grid(row=index, column=5, padx=(3,0))
                                     delete_button.configure(command= lambda 
@@ -559,11 +573,11 @@ class MainWindow():
                 new_1_arrow_down_btn.grid(row=row, column=1, padx=(0,5), sticky='w')
                 argument_label.grid(row=row, column=2, padx=(0,5), sticky='w')
                 argument_entry.grid(row=row, column=3, padx=(0,5), sticky='w')
-                if argument_label._text in ('Курсор по X,Y', 'Открытие программы'):
+                if argument_label._text in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                     sel_btn.grid(row=row, column=4)
-                    if argument_label._text == 'Открытие программы':
+                    if argument_label._text == UIScriptsButtons.OPEN_PROGRAM:
                         sel_btn.configure(command = lambda arg_entry=argument_entry: select_file_script(arg_entry, args_list, id))
-                    elif argument_label._text == 'Курсор по X,Y':
+                    elif argument_label._text == UIScriptsButtons.CURSOR_TO_XY:
                         sel_btn.configure(command = lambda arg_entry=argument_entry: show_cord(arg_entry, args_list, id))
                 del_btn.grid(row=row, column=5)
                 del_btn.configure(command=lambda:
@@ -585,11 +599,11 @@ class MainWindow():
                 new_2_arrow_down_btn.grid(row=row, column=1, padx=(0,5), sticky='w')
                 argument_label.grid(row=row, column=2, padx=(3,3), sticky='w')
                 argument_entry.grid(row=row, column=3, padx=(3,6), pady=(3,6), sticky='w')
-                if argument_label._text in ('Курсор по X,Y', 'Открытие программы'):
+                if argument_label._text in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                     sel_btn.grid(row=row, column=4, pady=5)
-                    if argument_label._text == 'Открытие программы':
+                    if argument_label._text == UIScriptsButtons.OPEN_PROGRAM:
                         sel_btn.configure(command = lambda arg_entry=argument_entry: select_file_script(arg_entry, args_list, id))
-                    elif argument_label._text == 'Курсор по X,Y':
+                    elif argument_label._text == UIScriptsButtons.CURSOR_TO_XY:
                         sel_btn.configure(command = lambda arg_entry=argument_entry: show_cord(arg_entry, args_list, id))
                 del_btn.grid(row=row, column=5, padx=(3,0))
                 del_btn.configure(command=lambda:
@@ -610,7 +624,8 @@ class MainWindow():
                 argument_entry.bind('<KeyRelease>', command= lambda save: save_script(args_list, id, False))
             # Виджеты для новой строки
             new_arg_lbl = ctk.CTkLabel(editor_page, text=choose_act_tab.get())
-            new_arg_entry = ctk.CTkEntry(editor_page, placeholder_text=ARGS_DICT[choose_act_tab.get()])
+            new_arg_entry = ctk.CTkEntry(editor_page, placeholder_text=ARGS_DICT[VALUES_TO_LABELS[choose_act_tab.get()]])
+
             new_arrow_up_btn = ctk.CTkButton(editor_page, width=0, height=0, image=arrow_up_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='', textvariable='up')
             new_delete_button = ctk.CTkButton(editor_page, width=0, height=0, image=delete_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='', textvariable=row)
             new_select_button = ctk.CTkButton(editor_page, width=0, height=0, image=select_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='')
@@ -623,11 +638,11 @@ class MainWindow():
                 new_arrow_up_btn = None
             new_arg_lbl.grid(row=row, column=2, padx=(0, 5), pady=(3,3))
             new_arg_entry.grid(row=row, column=3, padx=(0,5))
-            if choose_act_tab.get() in ('Курсор по X,Y', 'Открытие программы'):
+            if choose_act_tab.get() in (UIScriptsButtons.CURSOR_TO_XY, UIScriptsButtons.OPEN_PROGRAM):
                 new_select_button.grid(row=row, column=4)
-                if choose_act_tab.get() == 'Открытие программы':
+                if choose_act_tab.get() == UIScriptsButtons.OPEN_PROGRAM:
                     new_select_button.configure(command = lambda arg_entry=new_arg_entry: select_file_script(arg_entry, args_list, id))
-                elif choose_act_tab.get() == 'Курсор по X,Y':
+                elif choose_act_tab.get() == UIScriptsButtons.CURSOR_TO_XY:
                     new_select_button.configure(command = lambda arg_entry=new_arg_entry: show_cord(arg_entry, args_list, id))
             
             new_delete_button.grid(row=row, column=5)
@@ -709,12 +724,14 @@ class MainWindow():
                         arg = dict['arg_entry'].get()
                         if arg == '':
                             arg = 'None'
-                        commands[f'act_{idx}'] = [func, [arg]]
+                        commands[f'act_{idx}'] = [VALUES_TO_LABELS[func], [arg]]
                     except Exception as e:
+                        print(e)
                         pass
             name = prog_name_entry.get()
             if name == '':
-                name = f'Сценарий_{len(data)}'
+                name = translation.UI.SCRIPT_DEFALUT_NAME_PREFIX + f'_{len(data)}'
+            
             data = ({"id":index, "name": name, "commands": commands})
             
             #Замена функций уже в существующем сценарии или добавление нового
@@ -767,12 +784,12 @@ class MainWindow():
             for i, programm in enumerate(data):
                 row = i
                 #Строка - имя
-                name_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text='Имя программы/Сайта')
+                name_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text=translation.UI.PROGRAM_PLACEHOLDER_TITLE)
                 name_entry.grid(row=row, column=0, pady=5)
                 name_entry.insert(ctk.INSERT, programm['name'])
                 
                 #Строка - путь к файлу
-                path_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text='Путь программы/Ссылка')
+                path_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text=translation.UI.PROGRAM_PLACEHOLDER_PATH)
                 path_entry.grid(row=row, column=1, pady=5)
                 path_entry.insert(ctk.INSERT, programm['path'])
                 
@@ -790,9 +807,9 @@ class MainWindow():
                 select_button.configure(command = lambda name = name_entry, path=path_entry, fd = select_button: select_file(name, path))
                 
                 entry_dict = {
-                'name': name_entry,
-                'path': path_entry,
-                'index': programm['id']
+                    'name': name_entry,
+                    'path': path_entry,
+                    'index': programm['id']
                 }
 
                 entry_list.append(entry_dict)
@@ -802,7 +819,7 @@ class MainWindow():
 
             #Кнопка - добавление строк
             add_photo = ctk.CTkImage(Image.open('bin/plus.png'), size=(30,30))
-            add_button = ctk.CTkButton(programm_page, width=390, height=0, text='Новая команда', font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg)
+            add_button = ctk.CTkButton(programm_page, width=390, height=0, text=translation.UI.PROGRAM_BUTTON_NEW_COMMAND, font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg)
             add_button.configure(command= lambda: add_program(add_button, row))
             add_button.grid(row=row+1, columnspan=4, sticky='nsew')
             add_button.bind('<ButtonRelease-1>', lambda save: save_data(self= self, entry_list=entry_list))
@@ -819,10 +836,10 @@ class MainWindow():
                 except Exception:
                     index = 0
 
-            name_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text='Имя программы/Сайта')
+            name_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text=translation.UI.PROGRAM_PLACEHOLDER_TITLE)
             name_entry.grid(row=row, column=0, pady=5)
 
-            path_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text='Путь программы/Ссылка')
+            path_entry = ctk.CTkEntry(programm_page, width=155, placeholder_text=translation.UI.PROGRAM_PLACEHOLDER_PATH)
             path_entry.grid(row=row, column=1, pady=5)
             
             entry_dict = {
@@ -845,7 +862,7 @@ class MainWindow():
             delete_button.grid(row=row, column=2, pady=5)
             
             add_photo = ctk.CTkImage(Image.open('bin/plus.png'), size=(30,30))
-            add_button = ctk.CTkButton(programm_page, width=390, height=0, text='Новая команда', font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg)
+            add_button = ctk.CTkButton(programm_page, width=390, height=0, text=translation.UI.PROGRAM_BUTTON_NEW_COMMAND, font=('Bold', 18), image=add_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg)
             add_button.grid(row=row+1, columnspan=4, sticky='nsew')
             add_button.configure(command= lambda: add_program(add_button, row))
             
@@ -900,13 +917,13 @@ class MainWindow():
         
         def select_file(name, path):
             filetypes = (
-            ('All files', '*.*'),
-            ('Text files', '*.txt'),
-            ('Exe files', '*.exe')
+                ('All files', '*.*'),
+                ('Text files', '*.txt'),
+                ('Exe files', '*.exe')
             )
 
             filename = ctk.filedialog.askopenfilename(
-                title='Выберите файл',
+                title=translation.UI.CHOOSE_FILE,
                 initialdir= os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') ,
                 filetypes=filetypes)
             path.delete(0, 'end')
@@ -936,18 +953,18 @@ class MainWindow():
         global switch_date, switch_time, switch_usd, switch_eur, switch_btc, switch_weather, switch_voice_greet, switch_jarvis_link, city_id_entry, jarvis_link_entry, switch_autostart, gpt_api_entry, del_delay_entry, del_delay, select_photo_entry
 
         # Первый столбец
-        switch_date = ctk.CTkSwitch(settings_page, text='Дата')
-        switch_time = ctk.CTkSwitch(settings_page, text='Время')
-        switch_usd = ctk.CTkSwitch(settings_page, text='Доллар')
-        switch_eur = ctk.CTkSwitch(settings_page, text='Евро')
-        switch_btc = ctk.CTkSwitch(settings_page, text='Биткоин')
-        switch_voice_greet = ctk.CTkSwitch(settings_page, text='Звуковые\nответы')
-        switch_autostart = ctk.CTkSwitch(settings_page, text='Автозапуск')
-        del_delay_lbl = ctk.CTkLabel(settings_page, text='Удаление сообщений', font=('Bold', 18))
-        del_delay_entry = ctk.CTkEntry(settings_page, placeholder_text='Время в секундах', width=125)
+        switch_date = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_DATE)
+        switch_time = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_TIME)
+        switch_usd = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_DOLLAR)
+        switch_eur = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_EURO)
+        switch_btc = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_BTC)
+        switch_voice_greet = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_VOICE_LINES)
+        switch_autostart = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_AUTOSTART)
+        del_delay_lbl = ctk.CTkLabel(settings_page, text=translation.UI.SETTINGS_NAME_MESSAGE_AUTODELETE, font=('Bold', 18))
+        del_delay_entry = ctk.CTkEntry(settings_page, placeholder_text=translation.UI.SETTINGS_PLACEHOLDER_MESSAGE_AUTODELETE, width=125)
         select_photo_image = ctk.CTkImage(Image.open('bin/select.png'), size=(15,15))
-        select_photo_lbl = ctk.CTkLabel(settings_page, text='Картинка приветствия', font=('Bold', 18))
-        select_photo_entry = ctk.CTkEntry(settings_page, placeholder_text='Путь до картинки', width=185)
+        select_photo_lbl = ctk.CTkLabel(settings_page, text=translation.UI.SETTINGS_NAME_GREETING_IMAGE, font=('Bold', 18))
+        select_photo_entry = ctk.CTkEntry(settings_page, placeholder_text=translation.UI.SETTINGS_PLACEHOLDER_GREETING_IMAGE, width=185)
         select_photo_btn = ctk.CTkButton(settings_page, width=15, height=15, image=select_photo_image, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, text='')
         
         switch_date.grid(row=0, column=0, sticky='nsew', padx = 5, pady=5)
@@ -966,27 +983,27 @@ class MainWindow():
 
         #Второй столбец
         help_photo= ctk.CTkImage(Image.open('bin/help.png'), size=(15,15))
-        switch_weather = ctk.CTkSwitch(settings_page, text='Погода', command = lambda: MainWindow().show_entry(), variable=ctk.BooleanVar())
-        switch_jarvis_link = ctk.CTkSwitch(settings_page, text='Джарвис', command = lambda: MainWindow().show_entry(), variable=ctk.BooleanVar())
+        switch_weather = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_WEATHER, command = lambda: MainWindow().show_entry(), variable=ctk.BooleanVar())
+        switch_jarvis_link = ctk.CTkSwitch(settings_page, text=translation.UI.SETTINGS_NAME_JARVIS, command = lambda: MainWindow().show_entry(), variable=ctk.BooleanVar())
         help_weather_btn = ctk.CTkButton(settings_page, width=0, height=0, text='', image=help_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, command=lambda: webbrowser.open_new('https://telegra.ph/Nastrojka-Pc-Control-03-22-2'))
         help_jar_btn = ctk.CTkButton(settings_page, width=0, height=0, text='', image=help_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, command=lambda: webbrowser.open_new('https://t.me/c/1627334371/47'))
         help_gpt_btn = ctk.CTkButton(settings_page, width=0, height=0, text='', image=help_photo, bg_color=self.fg, fg_color=self.fg, hover_color=self.bg, command=lambda: webbrowser.open_new('https://platform.openai.com/account/api-keys'))
 
         switch_weather.grid(row=0, column=1, sticky='w', padx = (5,5))
 
-        city_id_entry = ctk.CTkEntry(settings_page, placeholder_text='Город\City id')
+        city_id_entry = ctk.CTkEntry(settings_page, placeholder_text=translation.UI.SETTINGS_PLACEHOLDER_CITY_ID)
         city_id_entry.configure(state = ctk.DISABLED)
         city_id_entry.grid(row=1, column=1, sticky='w', padx = (5,5), pady = (0, 5))
 
         switch_jarvis_link.grid(row=2, column=1, sticky='w', padx = (5,5))
-        jarvis_link_entry = ctk.CTkEntry(settings_page, placeholder_text='Введите ссылку для приёма текста')
+        jarvis_link_entry = ctk.CTkEntry(settings_page, placeholder_text=translation.UI.SETTINGS_PLACEHOLDER_JARVIS_LINK)
         jarvis_link_entry.configure(state = ctk.DISABLED)
         jarvis_link_entry.grid(row=3, column=1, sticky='w', padx = (5,5), pady = (0, 5))
 
-        gpt_api_label = ctk.CTkLabel(settings_page, text='ChatGPT API', font=('Bold', 18))
+        gpt_api_label = ctk.CTkLabel(settings_page, text=translation.UI.SETTINGS_NAME_CHATGPT_API, font=('Bold', 18))
         gpt_api_label.grid(row=4, column=1, sticky='w', padx = (5,5))
 
-        gpt_api_entry = ctk.CTkEntry(settings_page, placeholder_text='ChatGPT API')
+        gpt_api_entry = ctk.CTkEntry(settings_page, placeholder_text=translation.UI.SETTINGS_PLACEHODLER_CHATGPT_API)
         gpt_api_entry.grid(row=5, column=1, sticky='w', padx = (5,5))
 
         #Третий столбец
@@ -1043,10 +1060,10 @@ class MainWindow():
             switch_voice_greet.select()
         if weather:
             switch_weather.select()
-            city_id_entry.configure(state=ctk.NORMAL, placeholder_text = 'Город/City ID')
+            city_id_entry.configure(state=ctk.NORMAL, placeholder_text = translation.UI.SETTINGS_PLACEHOLDER_CITY_ID)
         if jarvis:
             switch_jarvis_link.select()
-            jarvis_link_entry.configure(state=ctk.NORMAL, placeholder_text = 'Введите ссылку для приёма текста')
+            jarvis_link_entry.configure(state=ctk.NORMAL, placeholder_text = translation.UI.SETTINGS_PLACEHOLDER_JARVIS_LINK)
         if autostart:
             switch_autostart.select()
 
@@ -1079,13 +1096,13 @@ class MainWindow():
         
         def select_file_settings(path) -> None:
             filetypes = (
-            ('All files', '*.*'),
-            ('Text files', '*.txt'),
-            ('Exe files', '*.exe')
+                ('All files', '*.*'),
+                ('Text files', '*.txt'),
+                ('Exe files', '*.exe')
             )
 
             filename = ctk.filedialog.askopenfilename(
-                title='Выберите файл',
+                title=translation.UI.CHOOSE_FILE,
                 initialdir= os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop') ,
                 filetypes=filetypes)
             path.delete(0, 'end')
@@ -1103,7 +1120,7 @@ class MainWindow():
             pass
         start_btn.configure(state = ctk.DISABLED)
         self.indicate(logs_btn_indicate, self.logs_page)
-        self.log_print('Запускаю..')
+        self.log_print(translation.LOGS.INFO_LAUNCHING)
         self.root.update()
         th_sound_ans = Thread(target=actions_manager.Actions().morning_sound_answer, args=(), name='sound_ans', daemon=True).start()
         th_start_msg = Thread(target=bot_manager.Telegram().start_message, args=(), name='Start_msg', daemon=True).start()
@@ -1226,7 +1243,7 @@ class MainWindow():
         frame_side_buttons.pack(side='left', padx = 10, pady=10, anchor='n')
         # Кнопка - Логи
         logs_btn = ctk.CTkButton(frame_side_buttons, 
-                                text='Логи', 
+                                text=translation.UI.BUTTON_LOGS, 
                                 width=80, 
                                 command=lambda: MainWindow().indicate(logs_btn_indicate, MainWindow().logs_page))
         logs_btn.pack(side='top', pady=10)
@@ -1237,7 +1254,7 @@ class MainWindow():
         logs_btn_indicate.place(x=3,y=12)
         # Кнопка - Бот
         bot_btn = ctk.CTkButton(frame_side_buttons, 
-                                text='Бот', 
+                                text=translation.UI.BUTTON_BOT, 
                                 width=80, 
                                 command=lambda: MainWindow().indicate(bot_btn_indicate, MainWindow().bot_page))
         bot_btn.pack()
@@ -1249,7 +1266,7 @@ class MainWindow():
 
         # Кнопка - Сценарии
         script_btn = ctk.CTkButton(frame_side_buttons, 
-                                    text='Сценарии',
+                                    text=translation.UI.BUTTON_SCRIPTS,
                                     font=('Bold', 12), 
                                     width=80, 
                                     command=lambda: MainWindow().indicate(script_btn_indicate, MainWindow().script_page))
@@ -1262,7 +1279,7 @@ class MainWindow():
 
         # Кнопка - Программы
         program_btn = ctk.CTkButton(frame_side_buttons, 
-                                    text='Программы',
+                                    text=translation.UI.BUTTON_PROGRAMS,
                                     font=('Bold', 12), 
                                     width=80, 
                                     command=lambda: MainWindow().indicate(program_btn_indicate, MainWindow().programm_page))
@@ -1275,7 +1292,7 @@ class MainWindow():
         
         # Кнопка - Настройки
         settings_btn = ctk.CTkButton(frame_side_buttons, 
-                                    text='Настройки', 
+                                    text=translation.UI.BUTTON_SETTINGS, 
                                     width=80, 
                                     command=lambda: MainWindow().indicate(settings_btn_indicate, MainWindow().settings_page))
         settings_btn.pack()
@@ -1291,7 +1308,7 @@ class MainWindow():
         main_frame.pack_propagate(False)
         main_frame.pack(side='left', padx=5, pady=10, anchor='n')
         # Кнопка - старт
-        start_btn = ctk.CTkButton(self.root, text='Запуск', width=100, height=30, command = lambda: MainWindow().start_btn_press())
+        start_btn = ctk.CTkButton(self.root, text=translation.UI.BUTTON_LAUNCH, width=100, height=30, command = lambda: MainWindow().start_btn_press())
         start_btn.pack()
         start_btn.place(x=435, y=270)
         # Кнопка перехода в ТГ.
@@ -1310,14 +1327,14 @@ class MainWindow():
     def no_license(self) -> None:
         """Вывод сообщения, что лицензия не обнаружена."""
         global no_license_lbl
-        no_license_lbl = ctk.CTkLabel(self.root, text='У вас нет лицензии\n\nНапишите @prpleprog', font=('Bold', 24), fg_color=self.bg, bg_color=self.bg)
+        no_license_lbl = ctk.CTkLabel(self.root, text=translation.UI.LICENSE_NO_LICENSE, font=('Bold', 24), fg_color=self.bg, bg_color=self.bg)
         no_license_lbl.place(x=155,y=70)
-        reload_license_btn = ctk.CTkButton(self.root, text='Проверить лицензию', font=('Bold', 18), command= lambda: Thread(target=self.check_license_btn, args=(), daemon=True).start())
+        reload_license_btn = ctk.CTkButton(self.root, text=translation.UI.BUTTON_CHECK_LICENSE, font=('Bold', 18), command= lambda: Thread(target=self.check_license_btn, args=(), daemon=True).start())
         reload_license_btn.place(x=182, y=164)
 	
     def check_license_btn(self) -> None:
         """Действие при нажатии кнопки - проверка лицензии."""
-        no_license_lbl.configure(text='Проверка лицензии...')
+        no_license_lbl.configure(text=translation.UI.CHECK_LICENSE_PROCESSING)
         
         if license_manager.LICENSE().check_license():
             try:
@@ -1325,7 +1342,7 @@ class MainWindow():
             except RuntimeError:
                 pass
         else:
-            no_license_lbl.configure(text='Лицензия не обнаружена')
+            no_license_lbl.configure(text=translation.UI.CHECK_LICENSE_NO_LICENSE)
         
     def no_license_info(self) -> None:
         """Страница заполнения информации для получении лицензии."""
@@ -1334,13 +1351,13 @@ class MainWindow():
         for frame in self.root.winfo_children():
             frame.destroy()
         
-        info_lbl = ctk.CTkLabel(self.root, text='Впишите ваш TG @username', font=('Bold', 24), fg_color=self.bg, bg_color=self.bg)
+        info_lbl = ctk.CTkLabel(self.root, text=translation.UI.GET_LICENSE_INPUT_TG_USERNAME, font=('Bold', 24), fg_color=self.bg, bg_color=self.bg)
         info_lbl.place(x=110,y=70)
 
-        info_entry = ctk.CTkEntry(self.root, placeholder_text='@prpleprog', width=320)
+        info_entry = ctk.CTkEntry(self.root, placeholder_text=translation.UI.GET_LICENSE_PLACEHOLDER_TG_USERNAME, width=320)
         info_entry.place(x=110, y=110)
 
-        info_btn = ctk.CTkButton(self.root, text='Готово', width=320, command=lambda: self.send_info())
+        info_btn = ctk.CTkButton(self.root, text=translation.UI.GET_LICENSE_BUTTON_DONE, width=320, command=lambda: self.send_info())
         info_btn.place(x=110, y=150)
 
     def send_info(self) -> None:
@@ -1348,6 +1365,7 @@ class MainWindow():
         nick=info_entry.get()
         
         if nick !='':
+            # NOTE(danil): no translation for BOT_LICENSE required
             BOT_LICENSE.send_message(license_manager.LICENSE().CHAT_ID, f'❤️ {license_manager.LICENSE().license_key()} | {nick}')
             BOT_LICENSE.send_message(license_manager.LICENSE().CHAT_ID, 'Внесите HWID в пост.\nhttps://pastebin.com/edit/4vBGLZ8C')
             

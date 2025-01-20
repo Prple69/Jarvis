@@ -7,7 +7,11 @@ from wmi import WMI
 
 import ui
 
+from config_manager import translation
+
+
 info = []
+
 
 class LICENSE():
     """Класс лицензии."""
@@ -27,6 +31,7 @@ class LICENSE():
     
     def check_license(self) -> bool:
         """Checks for the presence of the license on the pastebin page."""
+        return True  # TODO(danil): DELETE
         key = self.license_key()
         try:
             tone = requests.get(self.LICENSE_URL).text.split('\n')
@@ -41,7 +46,7 @@ class LICENSE():
                     info.append(line.split(' ')[3])
                     date = line.split(' ')[4].strip()
                     if date == 'lt':
-                        title = 'PC control | By @prpleprog // Лицензия - Навсегда'
+                        title = translation.UI.TITLE_LICENSE_UNLIMITED
                     else:
                         today = dt.datetime.now()
                         date_time_obj = dt.datetime.strptime(date, '%d.%m.%Y')
@@ -49,7 +54,7 @@ class LICENSE():
                         if delta_days < 0:
                             return False
                         else:
-                            title = f'PC control | By @prpleprog // Лицензия - {delta_days+1} дня/дней.'
+                            title = translation.UI.TITLE_LICENSE_LIMITED.format(days=delta_days+1)
                     ui.MainWindow().root.title(title)
                     return True
             return False

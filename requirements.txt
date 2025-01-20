@@ -16,3 +16,5 @@ pystray
 pytelegrambotapi
 wmi
 py-win-keyboard-layout
+g4f
+pydantic

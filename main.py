@@ -3,6 +3,7 @@ from threading import Thread
 import license_manager
 import ui
 import utils
+from config_manager import create_if_not_exist_config
 
 def load_config():
     """Загрузка и возвращение конфигурации из файла."""
@@ -29,7 +30,7 @@ def main():
     License = license_manager.LICENSE()
     
     print('Начинаю работу')
-    utils.create_if_not_exist_config()
+    create_if_not_exist_config()
     
     # Запуск приложения и настройка в зависимости от наличия лицензии
     start_app(App, License)

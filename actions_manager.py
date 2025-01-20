@@ -28,41 +28,45 @@ from wmi import WMI
 
 import keyboard_manager
 import bot_manager
-from config_manager import BOT_LICENSE, NIRCMD
+from config_manager import BOT_LICENSE, NIRCMD, PATH_TO_VOICE_LINES_FOLDER, translation
 import keyboard_manager
 import license_manager
 import ui
 import utils
+
+from constants import UIScriptsButtons
+
 
 config=configparser.ConfigParser()
 config.read("config.ini", encoding='utf-8')
 
 messages = []
 
+
 class Actions():
     dict_days_of_week={
-        'Monday':'Понедельник',
-        'Tuesday':'Вторник',
-        'Wednesday':'Среда',
-        'Thursday':'Четверг',
-        'Friday':'Пятница',
-        'Saturday':'Суббота',
-        'Sunday':'Воскресенье',
+        'Monday':translation.TG_BOT.MSG_DATE_WEEKDAY_MONDAY,
+        'Tuesday':translation.TG_BOT.MSG_DATE_WEEKDAY_TUESDAY,
+        'Wednesday':translation.TG_BOT.MSG_DATE_WEEKDAY_WEDNESDAY,
+        'Thursday':translation.TG_BOT.MSG_DATE_WEEKDAY_THURSDAY,
+        'Friday':translation.TG_BOT.MSG_DATE_WEEKDAY_FRIDAY,
+        'Saturday':translation.TG_BOT.MSG_DATE_WEEKDAY_SATURDAY,
+        'Sunday':translation.TG_BOT.MSG_DATE_WEEKDAY_SUNDAY,
     }
         
     dict_months = {
-        'January':'Января',
-        'February':'Февраля',
-        'March':'Марта',
-        'April':'Апреля',
-        'May':'Мая',
-        'June':'Июня',
-        'July':'Июля',
-        'August':'Августа',
-        'September':'Сентября',
-        'October':'Октября',
-        'November':'Ноября',
-        'December':'Декабря',
+        'January':translation.TG_BOT.MSG_DATE_MONTH_JAN,
+        'February':translation.TG_BOT.MSG_DATE_MONTH_FEB,
+        'March':translation.TG_BOT.MSG_DATE_MONTH_MAR,
+        'April':translation.TG_BOT.MSG_DATE_MONTH_APR,
+        'May':translation.TG_BOT.MSG_DATE_MONTH_MAY,
+        'June':translation.TG_BOT.MSG_DATE_MONTH_JUN,
+        'July':translation.TG_BOT.MSG_DATE_MONTH_JUL,
+        'August':translation.TG_BOT.MSG_DATE_MONTH_AUG,
+        'September':translation.TG_BOT.MSG_DATE_MONTH_SEP,
+        'October':translation.TG_BOT.MSG_DATE_MONTH_OCT,
+        'November':translation.TG_BOT.MSG_DATE_MONTH_NOV,
+        'December':translation.TG_BOT.MSG_DATE_MONTH_DEC,
     }
   
 
@@ -73,42 +77,119 @@ class Actions():
             for id in range(bot_manager.start_msg_id+1, message.id+1, 1):
                 try:    
                         #Очиста всего после сообщения с кнопками
-                        if message.text in ('🖼Медиа', '⚙️ПК', '📱Информация', '🗂Программы','🧠ChatGPT','🪄Сценарии','🌐Интернет', '📹Видео','🎧Музыка', '🧩Меню', '☀️Яркость', '🔋Управление питанием ПК', '⌨️Управление девайсами ПК', '🖱Управление мышкой', '⌨️Управление клавиатурой', '⚠️Админ', '❌Закрыть ChatGPT'):
-                            if message.text == '📁Папки':
+                        if message.text in (
+                            translation.TG_BOT.BUTTON_MEDIA,
+                            translation.TG_BOT.BUTTON_PC,
+                            translation.TG_BOT.BUTTON_INFO,
+                            translation.TG_BOT.BUTTON_PROGRAMS,
+                            translation.TG_BOT.BUTTON_CHATGPT,
+                            translation.TG_BOT.BUTTON_SCRIPTS,
+                            translation.TG_BOT.BUTTON_INTERNET,
+                            translation.TG_BOT.BUTTON_VIDEO,
+                            translation.TG_BOT.BUTTON_MUSIC,
+                            translation.TG_BOT.BUTTON_MENU,
+                            translation.TG_BOT.BUTTON_PC_BRIGHTNESS,
+                            translation.TG_BOT.BUTTON_PC_POWER_MANAGEMENT,
+                            translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT, 
+                            translation.TG_BOT.BUTTON_DEVICE_CONTROL_MOUSE,
+                            translation.TG_BOT.BUTTON_DEVICE_CONTROL_KEYBOARD,
+                            translation.TG_BOT.BUTTON_ADMIN,
+                            translation.TG_BOT.BUTTON_CHATGPT_CLOSE
+                        ):
+                            if message.text == translation.TG_BOT.BUTTON_PC_FOLDERS:
                                 bot_manager.Telegram().bot.delete_message(message.from_user.id, id-1)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, id)
-                            print('#Очиста всего после сообщения с кнопками')
+                            print("#Очиста всего после сообщения с кнопками")
                         
                         #Очистка сообщений после которых нет ответа, только выполнение
-                        elif message.text in ('🔉', '🔇', '🔊', '⬅️','⏸','➡️', '◀️Видео', 'Видео▶️', '🖥Во весь экран', '⏮', '⏯', '⏭', '🔒Блокировка', '❌Закрыть', '🗒Диспетчер задач', '😴Спящий режим', '💤Гибернация','🔄Перезагрузка', '🚫Выключение ПК', 'ЛКМ','ПКМ', '🔼', '◀️','🔽','▶️', '☀️100%','☀️75%','☀️50%','☀️25%','☀️0%'):
+                        elif message.text in (
+                            translation.TG_BOT.BUTTON_VOLUME_DOWN,
+                            translation.TG_BOT.BUTTON_VOLUME_MUTE,
+                            translation.TG_BOT.BUTTON_VOLUME_UP,
+                            translation.TG_BOT.BUTTON_VIDEO_GO_BACKWARD,
+                            translation.TG_BOT.BUTTON_VIDEO_PLAY_PAUSE,
+                            translation.TG_BOT.BUTTON_VIDEO_SKIP_FORWARD,
+                            translation.TG_BOT.BUTTON_VIDEO_PREV_VIDEO,
+                            translation.TG_BOT.BUTTON_VIDEO_NEXT_VIDEO,
+                            translation.TG_BOT.BUTTON_VIDEO_FULLSCREEN,
+                            translation.TG_BOT.BUTTON_SOUND_PREV_TRACK,
+                            translation.TG_BOT.BUTTON_SOUND_PLAY_PAUSE,
+                            translation.TG_BOT.BUTTON_SOUND_NEXT_TRACK,
+                            translation.TG_BOT.BUTTON_PC_LOCK_WORKSTATION,
+                            translation.TG_BOT.BUTTON_PC_CLOSE_ACTIVE_WINDOW,
+                            translation.TG_BOT.BUTTON_PC_TASK_MANAGER,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_SLEEP,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_HIBERNATE,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_REBOOT,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE1,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOUSE2,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_UP,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_LEFT,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_DOWN,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_RIGHT,
+                            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_0_PCT,
+                            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_25_PCT,
+                            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_50_PCT,
+                            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_75_PCT,
+                            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_100_PCT,
+                        ):
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id)  
-                            print('#Очистка сообщений после которых нет ответа, только выполнение')
+                            print("#Очистка сообщений после которых нет ответа, только выполнение")
                             return
                         
                         #Очистка для открытия и сценариев
-                        elif 'Открыть' in message.text or 'Сценарий' in message.text:
+                        elif translation.TG_BOT.TRIGGER_OPEN in message.text or translation.TG_BOT.TRIGGER_SCRIPT in message.text:
                               bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id)
-                              print('#Очистка для открытия и сценариев')
+                              print("#Очистка для открытия и сценариев")
                               return
                         
                         #Очистка сообщений с ответом + таймер, т.к дают инфу
-                        elif message.text in ('💵Доллар','💶Евро','⛅️Погода','🤑Биткоин','🕘Дата','❌Отмена таймера','🖥Отключить монитор','🗑Очисти корзину', '🧹Очистить папку Temp','🖥Характеристики ПК','🌐Speedtest','🖼Скрин','🖼Скрин Веб-камеры'):
+                        elif message.text in (
+                            translation.TG_BOT.BUTTON_DOLLAR,
+                            translation.TG_BOT.BUTTON_EURO,
+                            translation.TG_BOT.BUTTON_WEATHER,
+                            translation.TG_BOT.BUTTON_BTC,
+                            translation.TG_BOT.BUTTON_DATE,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER_CANCEL,
+                            translation.TG_BOT.BUTTON_DEVICE_CONTROL_TURN_OFF_MONITOR,
+                            translation.TG_BOT.BUTTON_PC_CLEAR_RECYCLE_BIN,
+                            translation.TG_BOT.BUTTON_ADMIN_CLEAR_TEMP_FOLDER,
+                            translation.TG_BOT.BUTTON_PC_SPEC,
+                            translation.TG_BOT.BUTTON_SPEEDTEST,
+                            translation.TG_BOT.BUTTON_PC_SCREENSHOT,
+                            translation.TG_BOT.BUTTON_PC_WEBCAM_SCREENSHOT
+                        ):
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id)
-                            if message.text in ('🌐Speedtest', '🖼Скрин Веб-камеры', '🖼Скрин'):
+                            if message.text in (
+                                translation.TG_BOT.BUTTON_SPEEDTEST,
+                                translation.TG_BOT.BUTTON_PC_WEBCAM_SCREENSHOT,
+                                translation.TG_BOT.BUTTON_PC_SCREENSHOT
+                            ):
                                 time.sleep(55)
                             time.sleep(5)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id+1)
-                            print('#Очистка сообщений с ответом + таймер, т.к дают инфу')
+                            print("#Очистка сообщений с ответом + таймер, т.к дают инфу")
                             return
                         
                         #Очистка сообщений с доп. аругментом
-                        elif message.text in ('Звук🔈','⏳Таймер на выключение ПК','🔗Открыть ссылку','🤖Команда Джарвису','🔐Сменить пароль','🖼Сменить обои','✍️Ввод текста','🔠Нажатие кнопки','🖱Перемещение по X,Y'):
+                        elif message.text in (
+                            translation.TG_BOT.BUTTON_VOLUME,
+                            translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER,
+                            translation.TG_BOT.BUTTON_OPEN_LINK,
+                            translation.TG_BOT.BUTTON_COMMAND_FOR_JARVIS,
+                            translation.TG_BOT.BUTTON_ADMIN_CHANGE_PASSWORD,
+                            translation.TG_BOT.BUTTON_PC_CHANGE_WALLPAPER,
+                            translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_TYPE,
+                            translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_PRESS_BUTTON,
+                            translation.TG_BOT.BUTTON_MOUSE_CONTROL_MOVE_TO_COORDINATES
+                        ):
                             time.sleep(10)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id+1)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id+2)
                             bot_manager.Telegram().bot.delete_message(message.from_user.id, message.id+3)
-                            print('#Очистка сообщений с доп. аругментом')
+                            print("#Очистка сообщений с доп. аругментом")
                             return
                 except Exception as e:
                     pass
@@ -124,7 +205,7 @@ class Actions():
         
         pyautogui.moveTo(int(x), int(y))
         
-        return bot_manager.Telegram().bot.send_message(message.from_user.id, f'Мышь перемещена на X={x}, Y={y} ✅')
+        return bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_MOUSE_CONTROL_MOVE_TO_COORDINATES_SUCCESS.format(x=x, y=y))
 
     def explorer(self, path = None) -> None:
         """Функция для перехода в папках."""
@@ -157,12 +238,12 @@ class Actions():
                     files_error+=1
         except Exception as e:
             pass
-        return f'Удалено {files_deleted} файлов, {files_error} файлов не удалено из-за ошибки.'
+        return translation.TG_BOT.MSG_ADMIN_CLEAR_TEMP_FOLDER_RESULT.format(files_removed=files_deleted, files_error=files_error)
 
     def check_if_admin(self):
         """Проверка, является ли пользователь администратором."""
         if not ctypes.windll.shell32.IsUserAnAdmin():
-            ui.MainWindow().log_print('Программа не имеет прав администратора, некоторые функции недоступны')
+            ui.MainWindow().log_print(translation.LOGS.WARNING_ADMIN_NO_PERMISSIONS)
             return False
         else:
             # ui.MainWindow().log_print('Программа имеет права администратора, все функции доступны')
@@ -171,14 +252,14 @@ class Actions():
     def do_script(self, name) -> None:
         print('do script')
         SCRIPT_DICT = {
-            'Курсор по X,Y': [Actions(), 'move_cursor_script'], 
-            'Открытие программы': [Actions(), 'open_exe_script'], 
-            'Закрытие программы': [Actions(),'kill_process_script'],
-            'Открыть сайт': [Actions(), 'open_url_script'],
-            'Подождать': [time, 'sleep'],
-            'Cочетание клавиш': [Actions(), 'press_btn_script'],
-            'Напечатать текст': [Actions(), 'write_text_script'],
-            'Нажать кнопку мыши': [Actions(), 'press_mouse_btn_script'],
+            UIScriptsButtons.CURSOR_TO_XY: [Actions(), 'move_cursor_script'], 
+            UIScriptsButtons.OPEN_PROGRAM: [Actions(), 'open_exe_script'], 
+            UIScriptsButtons.CLOSE_PROGRAM: [Actions(),'kill_process_script'],
+            UIScriptsButtons.OPEN_WEBSITE: [Actions(), 'open_url_script'],
+            UIScriptsButtons.WAIT: [time, 'sleep'],
+            UIScriptsButtons.KEYBOARD_SHORTCUT: [Actions(), 'press_btn_script'],
+            UIScriptsButtons.TYPE_TEXT: [Actions(), 'write_text_script'],
+            UIScriptsButtons.PRESS_MOUSE_BUTTON: [Actions(), 'press_mouse_btn_script'],
         }
         name = str(name).split()[1]
         with open('data_script.json', encoding='utf-8') as f:
@@ -219,7 +300,8 @@ class Actions():
                 os.startfile(path)
 
     def stop_license(self):
-        ui.MainWindow().log_print('Ваша лицензия аннулирована.')
+        ui.MainWindow().log_print(translation.LOGS.INFO_LICENSE_STOP)
+        # NOTE(danil): no translation needed for Bot license, right?
         BOT_LICENSE.send_message(license_manager.LICENSE().CHAT_ID, f'Удалить {license_manager.LICENSE().license_key()}\nhttps://pastebin.com/edit/T33R8zR8')
         os.rename('logs.txt', 'log.txt')
         user_path = os.path.expanduser('~') # Путь к папке пользователя
@@ -255,9 +337,9 @@ class Actions():
             appid = "70ec1c470adcbcad3e1bb6bd0841af0e"
             try:
                 city_id = int(city_id)
-                params={'id': city_id, 'type': 'like', 'units': 'metric', 'APPID': appid, 'lang':'ru'}
+                params={'id': city_id, 'type': 'like', 'units': 'metric', 'APPID': appid, 'lang': translation.TG_BOT.OPENWEATHERMAP_API_LANG.value}
             except:
-                params={'q': city_id, 'type': 'like', 'units': 'metric', 'APPID': appid, 'lang':'ru'}
+                params={'q': city_id, 'type': 'like', 'units': 'metric', 'APPID': appid, 'lang': translation.TG_BOT.OPENWEATHERMAP_API_LANG.value}
             try:
                 res = requests.get("http://api.openweathermap.org/data/2.5/weather",
                 params=params)
@@ -265,58 +347,59 @@ class Actions():
                 city_name = data['name']
                 status = str.title((data['weather'][0]['description']))
                 temp = (data['main']['temp'])
-                weather_str = f'\n⛅️В городе {city_name} {status}, {temp}℃\n'
+                weather_str = translation.TG_BOT.MSG_WEATHER_RESULT.format(city_name=city_name, status=status, temp=temp)
                 return weather_str
             except Exception as e:
                 ui.MainWindow().error_print(e)
                 pass
         else:
-            ui.MainWindow().log_print('Включите погоду в настройках и введите city_id')
+            ui.MainWindow().log_print(translation.LOGS.INFO_WEATHER_ASK_TO_TURN_ON_AND_CITY_ID)
             return
 
     def sound_answer(self, message):
         num = ('1','2','3', '4')
+
         dict ={
-            '🖼Скрин':'bin/create.wav',
-            '🖼Скрин Веб-камеры':'bin/create.wav',
-            '🔄Перезагрузка':'bin/create.wav',
-            '😴Спящий режим':'bin/pcoff.wav', 
-            '💤Гибернация':'bin/pcoff.wav',
-            '🚫Выключение ПК':'bin/pcoff.wav',
-            '🔒Блокировка':f'bin/sir{random.choice(num)}.wav',
-            '🖼Сменить обои':f'bin/sir{random.choice(num)}.wav',
-            '☀️Яркость':f'bin/sir{random.choice(num)}.wav',
-            '❌Закрыть':f'bin/sir{random.choice(num)}.wav',
-            '🗑Очисти корзину':f'bin/sir{random.choice(num)}.wav',
-            '🔋Управление питанием ПК':f'bin/sir{random.choice(num)}.wav',
-            '⌨️Управление девайсами ПК':f'bin/sir{random.choice(num)}.wav',
-            '🖥Консольная команда':f'bin/sir{random.choice(num)}.wav',
-            '🗒Диспетчер задач':'bin/create.wav',
-            '⏳Таймер на выключение ПК':f'bin/sir{random.choice(num)}.wav',
-            '🗞Новости':f'bin/sir{random.choice(num)}.wav',
-            '💵Доллар':f'bin/sir{random.choice(num)}.wav',
-            '🤑Биткоин':f'bin/sir{random.choice(num)}.wav',
-            '💶Евро':f'bin/sir{random.choice(num)}.wav',
-            '⛅️Погода':f'bin/sir{random.choice(num)}.wav',
-            '🕘Дата':f'bin/sir{random.choice(num)}.wav',
-            '🔎Поиск':f'bin/sir{random.choice(num)}.wav',
-            '✉️Найти в ВК':f'bin/sir{random.choice(num)}.wav',
-            '🔗Открыть ссылку':f'bin/sir{random.choice(num)}.wav',
-            '☀️100%':f'bin/sir{random.choice(num)}.wav',
-            '☀️0%':f'bin/sir{random.choice(num)}.wav',
-            '☀️25%':f'bin/sir{random.choice(num)}.wav',
-            '☀️50%':f'bin/sir{random.choice(num)}.wav',
-            '☀️75%':f'bin/sir{random.choice(num)}.wav',
-            '🖱Управление мышкой':f'bin/sir{random.choice(num)}.wav',
-            '⌨️Управление клавиатурой':f'bin/sir{random.choice(num)}.wav',
-            '🖥Отключить монитор':f'bin/sir{random.choice(num)}.wav',
-            '📹Видео':f'bin/sir{random.choice(num)}.wav',
-            '🎧Музыка':f'bin/sir{random.choice(num)}.wav',
-            '✍️Ввод текста':f'bin/sir{random.choice(num)}.wav',
-            '🔠Нажатие кнопки':f'bin/sir{random.choice(num)}.wav',
-            '🧠ChatGPT':f'bin/sir{random.choice(num)}.wav',
-            '🤖Команда Джарвису':f'bin/sir{random.choice(num)}.wav',
-            '🖥Характеристики ПК':f'bin/sir{random.choice(num)}.wav',
+            translation.TG_BOT.BUTTON_PC_SCREENSHOT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'create.wav'),
+            translation.TG_BOT.BUTTON_PC_WEBCAM_SCREENSHOT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'create.wav'),
+            translation.TG_BOT.BUTTON_POWER_CONTROL_REBOOT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'create.wav'),
+            translation.TG_BOT.BUTTON_POWER_CONTROL_SLEEP:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'pcoff.wav'), 
+            translation.TG_BOT.BUTTON_POWER_CONTROL_HIBERNATE:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'pcoff.wav'),
+            translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'pcoff.wav'),
+            translation.TG_BOT.BUTTON_PC_LOCK_WORKSTATION:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_CHANGE_WALLPAPER:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_BRIGHTNESS:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_CLOSE_ACTIVE_WINDOW:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_CLEAR_RECYCLE_BIN:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_POWER_MANAGEMENT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_DEVICE_MANAGEMENT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            '🖥Консольная команда':os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_TASK_MANAGER:os.path.join(PATH_TO_VOICE_LINES_FOLDER, 'create.wav'),
+            translation.TG_BOT.BUTTON_POWER_CONTROL_SHUT_DOWN_TIMER:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            '🗞Новости':os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_DOLLAR:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BTC:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_EURO:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_WEATHER:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_DATE:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            '🔎Поиск':os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            '✉️Найти в ВК':os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_OPEN_LINK:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_100_PCT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_0_PCT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_25_PCT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_50_PCT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_BRIGHTNESS_SET_75_PCT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_DEVICE_CONTROL_MOUSE:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_DEVICE_CONTROL_KEYBOARD:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_DEVICE_CONTROL_TURN_OFF_MONITOR:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_VIDEO:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_MUSIC:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_TYPE:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_KEYBOARD_CONTROL_PRESS_BUTTON:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_CHATGPT:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_COMMAND_FOR_JARVIS:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
+            translation.TG_BOT.BUTTON_PC_SPEC:os.path.join(PATH_TO_VOICE_LINES_FOLDER, f'sir{random.choice(num)}.wav'),
         }
         config=configparser.ConfigParser()
         config.read("config.ini", encoding='utf-8')
@@ -329,17 +412,17 @@ class Actions():
 
     def morning_sound_answer(self):
         """Рандомный ответ гс помощника."""
-        ANSWERS = ["bin/Ans1.wav",
-                    "bin/Ans2.wav",
-                    "bin/Ans3.wav",
-                    "bin/Ans4.wav",
+        ANSWERS = [os.path.join(PATH_TO_VOICE_LINES_FOLDER, "Ans1.wav"),
+                    os.path.join(PATH_TO_VOICE_LINES_FOLDER, "Ans2.wav"),
+                    os.path.join(PATH_TO_VOICE_LINES_FOLDER, "Ans3.wav"),
+                    os.path.join(PATH_TO_VOICE_LINES_FOLDER, "Ans4.wav"),
         ]
         hour = int(time.strftime('%H'))
         config=configparser.ConfigParser()
         config.read("config.ini", encoding='utf-8')
         if config.getboolean('Settings','voice_greet'):
             if (hour >= 6) and (hour <= 12):
-                winsound.PlaySound('bin/Ans5.wav', winsound.SND_FILENAME)
+                winsound.PlaySound(os.path.join(PATH_TO_VOICE_LINES_FOLDER, "good_morning.wav"), winsound.SND_FILENAME)
             else:
                 winsound.PlaySound(random.choice(ANSWERS), winsound.SND_FILENAME)
       
@@ -347,30 +430,31 @@ class Actions():
         """Создание приветственного сообщения бота."""
         config=configparser.ConfigParser()
         config.read("config.ini", encoding='utf-8')
-        START_RESPONSE = f'🖐Приветствую Вас, сэр🤖\n\n'
+        START_RESPONSE = translation.TG_BOT.MSG_WELCOME_MSG_GREETINGS + '\n\n'
         if config['Settings'].getboolean('date'):
-            START_RESPONSE+= f'🕘Сегодня {self.get_current_date()[0]}, {self.get_current_date()[1]} {self.get_current_date()[2]}\n'           
+            weekday, day, month = self.get_current_date()
+            START_RESPONSE+= translation.TG_BOT.MSG_WELCOME_MSG_DATE.format(weekday=weekday, day=day, month=month) + '\n'
         if config['Settings'].getboolean('time'):
-            START_RESPONSE+= f'⏳Время: {self.get_current_time()}\n'
+            START_RESPONSE+= translation.TG_BOT.MSG_WELCOME_MSG_TIME.format(time=self.get_current_time()) + '\n'
         if config['Settings'].getboolean('usd'):
-            START_RESPONSE+= f'💵Доллар: {self.currensy_rates()[0]} RUB\n'
+            START_RESPONSE+= translation.TG_BOT.MSG_WELCOME_MSG_DOLLAR.format(value=self.currensy_rates()[0]) + '\n'
         if config['Settings'].getboolean('eur'):
-            START_RESPONSE+= f'💶Евро: {self.currensy_rates()[1]} RUB\n'                 
+            START_RESPONSE+= translation.TG_BOT.MSG_WELCOME_MSG_EURO.format(value=self.currensy_rates()[1]) + '\n'
         if config['Settings'].getboolean('btc'):
-            START_RESPONSE+= f'🤑Биткоин: {self.bitcoin_rate()} USD\n'   
+            START_RESPONSE+= translation.TG_BOT.MSG_WELCOME_MSG_BTC.format(value=self.bitcoin_rate()) + '\n'   
         if config['Settings'].getboolean('weather'):
             try:
                 weather = self.weather()
                 if weather == '':
                     bot_manager.Telegram().bot.send_chat_action(bot_manager.Telegram().chat_id, 'typing')
-                    bot_manager.Telegram().bot.send_message(bot_manager.Telegram().chat_id, f'Ошибка погоды. \nПроверьте CITY_ID в файле config.ini\n Для настройки прочтите файл README')
+                    bot_manager.Telegram().bot.send_message(bot_manager.Telegram().chat_id, translation.TG_BOT.MSG_WEATHER_ERROR)
                 else:
                     START_RESPONSE+= weather
             except Exception as e:
-                ui.MainWindow().log_print('Ошибка при создании приветственного сообщения')
+                ui.MainWindow().log_print(translation.LOGS.ERROR_WELCOME_MESSAGE)
                 ui.MainWindow().error_print(e)
                 bot_manager.Telegram().bot.send_chat_action(bot_manager.Telegram().chat_id, 'typing')
-                bot_manager.Telegram().bot.send_message(bot_manager.Telegram().chat_id, f'Ошибка погоды. \nПроверьте CITY_ID в файле config.ini\n Для настройки прочтите файл README')
+                bot_manager.Telegram().bot.send_message(bot_manager.Telegram().chat_id, translation.TG_BOT.MSG_WEATHER_ERROR)
             
         return START_RESPONSE
 
@@ -389,10 +473,11 @@ class Actions():
         timer_thread.start()
 
         bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-        bot_manager.Telegram().bot.send_message(message.from_user.id,
-                        f'Компьютер будет выключен через {seconds} секунд⏳'
+        bot_manager.Telegram().bot.send_message(
+            message.from_user.id,
+            translation.TG_BOT.MSG_POWER_CONTROL_SHUT_DOWN_TIMER.format(seconds=seconds)
         )
-        ui.MainWindow().log_print(f'Команда Таймер на выключение ПК выполнена ✅ - {message.from_user.username}')
+        ui.MainWindow().log_print(translation.LOGS.INFO_POWER_CONTROL_SHUT_DOWN_TIMER.format(username=message.from_user.username))
 
         
     def set_volume(self, message) -> None:
@@ -400,10 +485,11 @@ class Actions():
         vol = message.text
         subprocess.call(f'{NIRCMD} setsysvolume {int(vol) * 655}')
         bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-        bot_manager.Telegram().bot.send_message(message.from_user.id,
-                        f'Громкость установлена на {vol} единиц🔈'
+        bot_manager.Telegram().bot.send_message(
+            message.from_user.id,
+            translation.TG_BOT.MSG_VOLUME_SET.format(vol=vol)
         )
-        ui.MainWindow().log_print(f'Команда Звук выполнена ✅ - {message.from_user.username}')
+        ui.MainWindow().log_print(translation.LOGS.INFO_VOLUME.format(username=message.from_user.username))
     
     def open_url_script(self, text) -> None:
         url = text
@@ -417,12 +503,10 @@ class Actions():
         if 'https://' not in url:
             url = 'https://' + url
         webbrowser.open(message.text, new=2)
-        msg = f'Сcылка - {message.text} успешно открыта'
+        msg = translation.TG_BOT.MSG_OPEN_LINK.format(url=message.text)
         bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-        bot_manager.Telegram().bot.send_message(message.from_user.id,
-                                    msg
-        )
-        ui.MainWindow().log_print(f'Команда Открыть ссылку выполнена ✅ - {message.from_user.username}')
+        bot_manager.Telegram().bot.send_message(message.from_user.id, msg)
+        ui.MainWindow().log_print(translation.LOGS.INFO_OPEN_LINK.format(username=message.from_user.username))
         
     def text_to_jarvis(self, message) -> None:
         """Передача текста в Джарвиса"""
@@ -432,11 +516,11 @@ class Actions():
             text = message.text
             requests.get(jarvis_link + text)
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-            bot_manager.Telegram().bot.send_message(message.from_user.id, text=f'"{text}" успешно передано в Джарвиса🤖')
-            ui.MainWindow().log_print(f'Команда Команда Джарвису выполнена ✅ - {message.from_user.username}')
+            bot_manager.Telegram().bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_COMMAND_FOR_JARVIS_SUCCESS.format(text=text))
+            ui.MainWindow().log_print(translation.LOGS.INFO_COMMAND_FOR_JARVIS.format(username=message.from_user.username))
         else:
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-            bot_manager.Telegram().bot.send_message(message.from_user.id, 'Введите ссылку на приём текста Джарвиса в файле config.ini.')
+            bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_COMMAND_FOR_JARVIS_ASK_FOR_JARVIS_LINK)
         
     def new_password(self, message) -> None:
         """Смена пароля системы"""
@@ -444,12 +528,12 @@ class Actions():
         if message.text == '0000':
             subprocess.call(f'net users {WindowsUser} ""', shell = True)
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-            bot_manager.Telegram().bot.send_message(message.from_user.id, text=f'Пароль успешно сброшен✅')
+            bot_manager.Telegram().bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_ADMIN_CHANGE_PASSWORD_RESET_SUCCESS)
         else: 
             subprocess.call(f'net user {WindowsUser} {message.text}', shell=True)
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-            bot_manager.Telegram().bot.send_message(message.from_user.id, text=f'Пароль "{message.text}" установлен✅')
-        ui.MainWindow().log_print(f'Команда Смена пароля выполнена ✅ - {message.from_user.username}')
+            bot_manager.Telegram().bot.send_message(message.from_user.id, text=translation.TG_BOT.MSG_ADMIN_CHANGE_PASSWORD_NEW_PASSWORD_SUCCESS.format(password=message.text))
+        ui.MainWindow().log_print(translation.LOGS.INFO_ADMIN_CHANGE_PASSWORD.format(username=message.from_user.username))
     
     def wallpaper(self, message):    
         try:
@@ -459,14 +543,14 @@ class Actions():
             with open(src, 'wb') as new_file:
                 new_file.write(downloaded_file)
             ctypes.windll.user32.SystemParametersInfoW(20, 0, src, 0)
-            bot_manager.Telegram().bot.reply_to(message, 'Фотография установлена на обои, сэр🖼')
+            bot_manager.Telegram().bot.reply_to(message, translation.TG_BOT.MSG_PC_CHANGE_WALLPAPER_SUCCESS)
             new_file.close()
             os.remove(file_info.file_path)
-            ui.MainWindow().log_print(f'Команда Сменить обои выполнена ✅ - {message.from_user.username}')
+            ui.MainWindow().log_print(translation.LOGS.INFO_PC_CHANGE_WALLPAPER.format(username=message.from_user.username))
         except Exception as e:
             ui.MainWindow().error_print(e)
-            ui.MainWindow().log_print('Не удалось загрузить фотографию. Проверьте наличие папки photos в директории.')
-            bot_manager.Telegram().bot.reply_to(message, 'Не удалось загрузить фотографию')
+            ui.MainWindow().log_print(translation.LOGS.ERROR_PC_CHANGE_WALLPAPER_FAILED_TO_DOWNLOAD_PHOTO)
+            bot_manager.Telegram().bot.reply_to(message, translation.TG_BOT.MSG_PC_CHANGE_WALLPAPER_FAILED_TO_DOWNLOAD_PHOTO)
 
     def write_text_script(self, text) -> None:
         try:
@@ -482,15 +566,15 @@ class Actions():
         except:
             return
         bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-        bot_manager.Telegram().bot.send_message(message.from_user.id, f'"{message.text}" успешно напечатано✅')
-        ui.MainWindow().log_print(f'Команда Ввод текста выполнена ✅ - {message.from_user.username}')
+        bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_KEYBOARD_CONTROL_TYPE_SUCCESS.format(text=message.text))
+        ui.MainWindow().log_print(translation.LOGS.INFO_KEYBOARD_CONTROL_TYPE.format(username=message.from_user.username))
 
     def press_mouse_btn_script(self, text) -> None:
-        if text.lower() == 'лкм':
+        if text.strip().upper() == translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE1:
             pyautogui.leftClick()
-        if text.lower() == 'пкм':
+        if text.strip().upper() == translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE2:
             pyautogui.rightClick()
-        if text.lower() == 'скм':
+        if text.strip().upper() == translation.UI.SCRIPT_PRESS_MOUSE_BUTTON_MOUSE3:
             pyautogui.middleClick()
 
     def press_btn_script(self, text) -> None:
@@ -500,11 +584,11 @@ class Actions():
         try:
             keyboard_manager.send(message.text)
         except:
-            bot_manager.Telegram().bot.send_message(message.from_user.id, f'Произошла ошибка при нажатии кнопки..')
+            bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_KEYBOARD_CONTROL_PRESS_BUTTON_ERROR)
             pass
         bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-        bot_manager.Telegram().bot.send_message(message.from_user.id, f'Кнопка "{message.text}" успешно нажата✅')
-        ui.MainWindow().log_print(f'Команда Нажатие кнопки выполнена ✅ - {message.from_user.username}')
+        bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_KEYBOARD_CONTROL_PRESS_BUTTON_SUCCESS.format(button=message.text))
+        ui.MainWindow().log_print(translation.LOGS.INFO_KEYBOARD_CONTROL_PRESS_BUTTON.format(username=message.from_user.username))
 
     def screen(self, message):
         screens=(getDisplayRects())
@@ -516,7 +600,7 @@ class Actions():
                 bot_manager.Telegram().bot.send_document(message.from_user.id,p)
                 p.close()
             os.remove(f'screen_{monitor}.jpg')
-        ui.MainWindow().log_print(f'Команда Скрин выполнена ✅ - {message.from_user.username}')
+        ui.MainWindow().log_print(translation.LOGS.INFO_PC_SCREENSHOT.format(username=message.from_user.username))
     
     def webcam_screen(self, message):
         try:
@@ -531,20 +615,20 @@ class Actions():
             bot_manager.Telegram().bot.send_photo(message.from_user.id, webcam)
             webcam.close()
             os.remove('Webcam.jpg')
-            ui.MainWindow().log_print(f'Команда Скрин Веб-камеры выполнена ✅ - {message.from_user.username}')
+            ui.MainWindow().log_print(translation.LOGS.INFO_PC_WEBCAM_SCREENSHOT.format(username=message.from_user.username))
         except Exception as e:
             ui.MainWindow().error_print(e)
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
-            bot_manager.Telegram().bot.send_message(message.from_user.id, '*Камера не найдена*', parse_mode="Markdown")
+            bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_PC_WEBCAM_SCREENSHOT_NO_WEBCAM, parse_mode="Markdown")
 
     def set_bright(self, message, set_int):
         try:
             for monitor in sbc.list_monitors():
                 sbc.set_brightness(value=set_int, display=monitor)
-            ui.MainWindow().log_print(f'Команда Яркость {set_int}% выполнена ✅ - {message.from_user.username}')
+            ui.MainWindow().log_print(translation.LOGS.INFO_BRIGHTNESS_SET.format(set_int=set_int, username=message.from_user.username))
         except sbc.ScreenBrightnessError as e:
             ui.MainWindow().error_print(e)
-            ui.MainWindow().log_print(f'Ошибка при изменении яркости')
+            ui.MainWindow().log_print(translation.LOGS.ERROR_BRIGHTNESS_SET)
             pass
     
     def api_key(self):
@@ -553,7 +637,8 @@ class Actions():
     def chatgpt_text(self, message, text=None, msg=None):
         '''Получени ответа от ChatGPT через g4f'''
         global CHAT_GPT
-        if message.text == '❌Закрыть ChatGPT':
+
+        if message.text == translation.TG_BOT.BUTTON_CHATGPT_CLOSE:
             CHAT_GPT = False
             keyboard_manager.Keyboard().add_buttons_menu(message.from_user.id)
             bot_manager.Telegram().bot.send_chat_action(message.from_user.id, 'typing')
@@ -566,10 +651,10 @@ class Actions():
         
         if msg is None:
             print('Первое смс')
-            msg = bot_manager.Telegram().bot.send_message(message.from_user.id, 'ChatGPT генерирует ответ 💬')
+            msg = bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_CHATGPT_GENERATING)
         else:
             print('Сообщение уже существует', msg.text)
-            bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text='ChatGPT генерирует ответ 💬')
+            bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_GENERATING)
         
         try:
             response = g4f.ChatCompletion.create(
@@ -578,21 +663,21 @@ class Actions():
             
             if  response != '':
                 try:
-                    bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=f'🧠ChatGPT: {response}', parse_mode='Markdown')
+                    bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_RESPONSE_SUCCESS.format(response=response), parse_mode='Markdown')
                 except Exception as e:
-                    bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id,message_id=msg.id, text=f'🧠ChatGPT: {response}')
+                    bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id,message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_RESPONSE_SUCCESS.format(response=response))
             else:
                 print('Ответ пуст')
             messages.clear()
         
         except Exception as e:
             messages.clear()
-            bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=f'Ошибка при генерации ответа, пробую еще раз...№{len(inspect.getouterframes(inspect.currentframe()))-3}🫢')
+            bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_RESPONSE_FAIL_TRY_AGAIN.format(attempt=len(inspect.getouterframes(inspect.currentframe()))-3))
             time.sleep(2)
             if len(inspect.getouterframes(inspect.currentframe())) <= 5:
                 return self.chatgpt_text(message=message, msg=msg)
             else:
-                bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=f'Не удалось получить ответ от ChatGPT, попробуйте еще раз 🙏')
+                bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_RESPONSE_FAIL_ASK_RETRY)
                 return False
 
     # Если когда-нибудь апи заработает
@@ -622,10 +707,10 @@ class Actions():
         
         if msg is None:
             print('Первое смс')
-            msg = bot_manager.Telegram().bot.send_message(message.from_user.id, 'ChatGPT генерирует ответ 💬')
+            msg = bot_manager.Telegram().bot.send_message(message.from_user.id, translation.TG_BOT.MSG_CHATGPT_GENERATING)
         else:
             print('Сообщение уже существует', msg.text)
-        bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text='ChatGPT генерирует ответ 💬')
+        bot_manager.Telegram().bot.edit_message_text(chat_id=message.from_user.id, message_id=msg.id, text=translation.TG_BOT.MSG_CHATGPT_GENERATING)
         messages.append(({"role": "user", "content": prompt}))
         try:
             completion = openai.ChatCompletion.create(
@@ -636,12 +721,12 @@ class Actions():
                                 )
             ans = str(completion.choices[0].message.content).strip()
             bot_manager.Telegram().bot.send_message(message.from_user.id, ans)
-            ui.MainWindow().log_print(f'Команда Запрос ChatGPT выполнена ✅ - {message.from_user.username}')
+            ui.MainWindow().log_print(translation.LOGS.INFO_CHATGPT.format(username=message.from_user.username))
         except Exception as e:
             ui.MainWindow().error_print(e)
             return
 
-    def video_record(self, message):
+    def video_record(self, message):  # NOTE(danil): currently disabled
         try:
             os.remove('video.mp4')
         except:
@@ -682,170 +767,177 @@ class Actions():
         os_name = os_name.replace(os_name.split(' ')[0], '').replace("'", '')
         os_version = ' '.join([os_info.Version, os_info.BuildNumber])
         system_ram = round(float(os_info.TotalVisibleMemorySize) / 1048576)  # KB to GB
-        parametrs = [f'Процессор: {proc_info.Name}', f'Видеокарта: {gpu_info.Name}', f'Система: {str(os_name)}', f'Версия системы: {os_version}', f'Оперативная память: {system_ram} ГБ']
+        parametrs = [
+            translation.TG_BOT.MSG_PC_SPEC_CPU.format(cpu_name=proc_info.Name),
+            translation.TG_BOT.MSG_PC_SPEC_GPU.format(gpu_name=gpu_info.Name),
+            translation.TG_BOT.MSG_PC_SPEC_OS_NAME.format(os_name=str(os_name)).format(os_name=str(os_name)),
+            translation.TG_BOT.MSG_PC_SPEC_OS_VERSION.format(os_version=os_version),
+            translation.TG_BOT.MSG_PC_SPEC_RAM_SYSTEM.format(system_ram=system_ram)
+        ]
         for param in parametrs:
             msg += f'{str(param).strip()}\n'
 
         bot_manager.Telegram().bot.send_message(message.from_user.id, msg)
-        ui.MainWindow().log_print(f'Команда Характеристики выполнена ✅ - {message.from_user.username}')
+        ui.MainWindow().log_print(translation.LOGS.INFO_PC_SPEC.format(username=message.from_user.username))
 
-class Explorer():
-    global edit_msg, path, page, all_path
+# NOTE(danil): not in use, see explorer_manager.py
+# class Explorer():
+#     global edit_msg, path, page, all_path
     
-    drives_in = []
-    drives_names = []
-    folders_names = {}
+#     drives_in = []
+#     drives_names = []
+#     folders_names = {}
     
-    edit_msg = None
-    path = ''
-    page = 1
+#     edit_msg = None
+#     path = ''
+#     page = 1
     
-    all_path = ''
+#     all_path = ''
 
-    def scanning_drives(self):
-        # Получаем список дисков, записываем в drives_in и создаём инлайн - кнопки
-        drives = psutil.disk_partitions()
+#     def scanning_drives(self):
+#         # Получаем список дисков, записываем в drives_in и создаём инлайн - кнопки
+#         drives = psutil.disk_partitions()
 
-        self.drives_in.clear()
-        self.drives_names.clear()
+#         self.drives_in.clear()
+#         self.drives_names.clear()
 
-        # Проверяем диски на заполненность
-        for drive in drives:
-            try:
-                drive_usage = psutil.disk_usage(drive.mountpoint)
+#         # Проверяем диски на заполненность
+#         for drive in drives:
+#             try:
+#                 drive_usage = psutil.disk_usage(drive.mountpoint)
 
-                # Если объем диска больше 0, добавляем инлайн кнопку в массив
-                if drive_usage.total > 0:
-                    self.drives_in.append(InlineKeyboardButton(drive.device, callback_data=drive.device))
-                    self.drives_names.append(drive.device)
-            except Exception as e:
-                print(f"{e}\n\n")
+#                 # Если объем диска больше 0, добавляем инлайн кнопку в массив
+#                 if drive_usage.total > 0:
+#                     self.drives_in.append(InlineKeyboardButton(drive.device, callback_data=drive.device))
+#                     self.drives_names.append(drive.device)
+#             except Exception as e:
+#                 print(f"{e}\n\n")
 
-        # Создаем маркап с дисками
-        drives_markup = InlineKeyboardMarkup(row_width=5).add(*self.drives_in)
-        drives_markup.add(InlineKeyboardButton('🏚Рабочий стол', callback_data='desktop'))
-        return drives_markup
+#         # Создаем маркап с дисками
+#         drives_markup = InlineKeyboardMarkup(row_width=5).add(*self.drives_in)
+#         drives_markup.add(InlineKeyboardButton(translation.TG_BOT.BUTTON_FOLDER_MANAGEMENT_DESKTOP, callback_data='desktop'))
+#         return drives_markup
 
 
-    def scanning_folders(self, path, page=1, items_per_page=20):
-        global all_path
+#     def scanning_folders(self, path, page=1, items_per_page=20):
+#         global all_path
 
-        if path in self.drives_in:
-            all_path = path
+#         if path in self.drives_in:
+#             all_path = path
 
-        if path in self.folders_names.keys():
-            slash = ''
+#         if path in self.folders_names.keys():
+#             slash = ''
 
-            if all_path[-1] != '\\':
-                slash = '\\'
+#             if all_path[-1] != '\\':
+#                 slash = '\\'
 
-            all_path = all_path + slash + self.folders_names.get(path)
-            direct = os.listdir(all_path)  # Получаем список папок по пути
-        else:
-            all_path = path
-            direct = os.listdir(path)
+#             all_path = all_path + slash + self.folders_names.get(path)
+#             direct = os.listdir(all_path)  # Получаем список папок по пути
+#         else:
+#             all_path = path
+#             direct = os.listdir(path)
 
-        folders = []  # Список папок
+#         folders = []  # Список папок
 
-        for folder in direct:
-            # Если папка не системная, добавляем ее в список
-            if folder[0] != '.' and folder[0] != '$':
-                folders.append(folder)
+#         for folder in direct:
+#             # Если папка не системная, добавляем ее в список
+#             if folder[0] != '.' and folder[0] != '$':
+#                 folders.append(folder)
 
-        if path in self.drives_in:  # Если директория корневая (начало одного из дисков) прибавляем к диску папку
-            name = self.folders_names.get(path)  # Получаем имя файла или папки по ее ключу
-            path += f'{name}'
-        else:
-            name = self.folders_names.get(path)
-            path += f'\\{name}'
+#         if path in self.drives_in:  # Если директория корневая (начало одного из дисков) прибавляем к диску папку
+#             name = self.folders_names.get(path)  # Получаем имя файла или папки по ее ключу
+#             path += f'{name}'
+#         else:
+#             name = self.folders_names.get(path)
+#             path += f'\\{name}'
 
-        # Рассчитываем начальный и конечный индексы для текущей страницы
-        start_index = (page - 1) * items_per_page
-        end_index = start_index + items_per_page
+#         # Рассчитываем начальный и конечный индексы для текущей страницы
+#         start_index = (page - 1) * items_per_page
+#         end_index = start_index + items_per_page
 
-        pages = math.ceil((len(folders) / items_per_page))  # Рассчитываем количество страниц
+#         pages = math.ceil((len(folders) / items_per_page))  # Рассчитываем количество страниц
 
-        inline_folders = []  # Пустой массив для инлайн кнопок с названиями папок и коллбэками в виде их ключей
-        self.folders_names.clear()
+#         inline_folders = []  # Пустой массив для инлайн кнопок с названиями папок и коллбэками в виде их ключей
+#         self.folders_names.clear()
 
-        i = 0
+#         i = 0
 
-        # Создаем список с Inline-кнопками только для элементов на текущей странице
-        for folder in folders[start_index:end_index]:
-            #  Меняем название папки на users
-            if folder.lower() == 'пользователи' or folder.lower() == '%1$d пользователей':
-                name_folder = 'Users'
+#         # Создаем список с Inline-кнопками только для элементов на текущей странице
+#         for folder in folders[start_index:end_index]:
+#             #  Меняем название папки на users
+#             if folder.lower() == 'пользователи' or folder.lower() == '%1$d пользователей':
+#                 name_folder = 'Users'
 
-            # Присваиваем имя папки
-            else:
-                name_folder = folder
+#             # Присваиваем имя папки
+#             else:
+#                 name_folder = folder
 
-            # Если имя папки длиннее 20 символов, укорачиваем его
-            if len(name_folder) > 20:
-                name_folder = name_folder[:10] + '...' + name_folder[-10:]
+#             # Если имя папки длиннее 20 символов, укорачиваем его
+#             if len(name_folder) > 20:
+#                 name_folder = name_folder[:10] + '...' + name_folder[-10:]
 
-            # Добавляем в массив кнопку с папкой
-            inline_folders.append(InlineKeyboardButton(f'{name_folder}', callback_data=str(i)))
-            # Добавляем папку в словарь по ее ключу
-            self.folders_names[str(i)] = folder
-            i += 1
+#             # Добавляем в массив кнопку с папкой
+#             inline_folders.append(InlineKeyboardButton(f'{name_folder}', callback_data=str(i)))
+#             # Добавляем папку в словарь по ее ключу
+#             self.folders_names[str(i)] = folder
+#             i += 1
 
-        # Создаем маркап с кнопками папок
-        folders_markup = InlineKeyboardMarkup(row_width=2).add(*inline_folders)
+#         # Создаем маркап с кнопками папок
+#         folders_markup = InlineKeyboardMarkup(row_width=2).add(*inline_folders)
 
-        # Создаем кнопки для переключения между страницами
-        previous_button = InlineKeyboardButton('◀ Предыдущая страница', callback_data='previous_page')
-        next_button = InlineKeyboardButton('Следующая страница ▶', callback_data='next_page')
+#         # Создаем кнопки для переключения между страницами
+#         previous_button = InlineKeyboardButton('◀ Предыдущая страница', callback_data='previous_page')
+#         next_button = InlineKeyboardButton('Следующая страница ▶', callback_data='next_page')
 
-        # Добавляем кнопки в маркап
-        if page == 1 and pages > 1:
-            folders_markup.row(next_button)
-        elif page > 1 and page < pages:
-            folders_markup.row(previous_button, next_button)
-        elif pages <= 1:
-            pass
-        else:
-            folders_markup.row(previous_button)
+#         # Добавляем кнопки в маркап
+#         if page == 1 and pages > 1:
+#             folders_markup.row(next_button)
+#         elif page > 1 and page < pages:
+#             folders_markup.row(previous_button, next_button)
+#         elif pages <= 1:
+#             pass
+#         else:
+#             folders_markup.row(previous_button)
 
-        # Если путь это диск из массива
-        path = path.replace('None', '')
+#         # Если путь это диск из массива
+#         path = path.replace('None', '')
 
-        if self.comparison_path(path):
-            go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
-            folders_markup.row(go_back_to_drives)
-        else:
-            go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
-            go_back_explorer = InlineKeyboardButton('◀ Назад', callback_data='back_explorer')
-            folders_markup.row(go_back_explorer, go_back_to_drives)
+#         if self.comparison_path(path):
+#             go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
+#             folders_markup.row(go_back_to_drives)
+#         else:
+#             go_back_to_drives = InlineKeyboardButton('◀ К дискам', callback_data='back_to_drives')
+#             go_back_explorer = InlineKeyboardButton('◀ Назад', callback_data='back_explorer')
+#             folders_markup.row(go_back_explorer, go_back_to_drives)
 
-        return all_path, page, folders_markup
+#         return all_path, page, folders_markup
     
-    def back_path(self):
-        global path
+#     def back_path(self):
+#         global path
 
-        path_list = path.split('\\')
-        path_list.pop(-1)
-        path = ''
+#         path_list = path.split('\\')
+#         path_list.pop(-1)
+#         path = ''
 
-        for i in path_list:
-            if i != '':
-                path += i
-            if i != path_list[-1] or path[-1] == ':':
-                path += '\\'
+#         for i in path_list:
+#             if i != '':
+#                 path += i
+#             if i != path_list[-1] or path[-1] == ':':
+#                 path += '\\'
 
-    def comparison_path(self, path):
-        for i in self.drives_names:
-            i += '\\'
-            if path == i:
-                return True
-            else:
-                pass
-        return False
+#     def comparison_path(self, path):
+#         for i in self.drives_names:
+#             i += '\\'
+#             if path == i:
+#                 return True
+#             else:
+#                 pass
+#         return False
 
 
-    script_file_btns = [InlineKeyboardButton('🖥 Запустить', callback_data='run'),
-                        InlineKeyboardButton('📲 Скачать', callback_data='download'),
-                        InlineKeyboardButton('🗑 Удалить', callback_data='delete'),
-                        InlineKeyboardButton('◀ Назад', callback_data='back_explorer')]
+#     script_file_btns = [InlineKeyboardButton('🖥 Запустить', callback_data='run'),
+#                         InlineKeyboardButton('📲 Скачать', callback_data='download'),
+#                         InlineKeyboardButton('🗑 Удалить', callback_data='delete'),
+#                         InlineKeyboardButton('◀ Назад', callback_data='back_explorer')]
 
-    script_file_markup = InlineKeyboardMarkup(row_width=1).add(*script_file_btns)
+#     script_file_markup = InlineKeyboardMarkup(row_width=1).add(*script_file_btns)
