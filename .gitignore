@@ -9,3 +9,4 @@
 *.ini
 *.txt
 !requirements.txt
+*ffmpeg.exe*
