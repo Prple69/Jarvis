@@ -1,4 +1,4 @@
-from ..enums import OpenWeatherLang
+from ..enums import AvailableLanguages, OpenWeatherLang
 from ..schemas import Translation, TranslationLogs, TranslationTGBot, TranslationUI
 
 
@@ -364,7 +364,7 @@ def get_translation_en():
         TRIGGER_SCRIPT="Script", # TODO(danil): mb move elsewhere
         OPENWEATHERMAP_API_LANG=OpenWeatherLang.EN,  # TODO(danil): mb move elsewhere
     )
-    translation_EN = Translation(UI=translationUI_EN, TG_BOT=translationTGBot_EN, LOGS=translationLogs_EN)
+    translation_EN = Translation(LANG=AvailableLanguages.EN, UI=translationUI_EN, TG_BOT=translationTGBot_EN, LOGS=translationLogs_EN)
 
     return translation_EN
 

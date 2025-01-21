@@ -1,4 +1,4 @@
-from ..enums import OpenWeatherLang
+from ..enums import AvailableLanguages, OpenWeatherLang
 from ..schemas import Translation, TranslationLogs, TranslationTGBot, TranslationUI
 
 
@@ -365,6 +365,6 @@ def get_translation_ru():
         OPENWEATHERMAP_API_LANG=OpenWeatherLang.RU,  # TODO(danil): mb move elsewhere
 
     )
-    translation_RU = Translation(UI=translationUI_RU, TG_BOT=translationTGBot_RU, LOGS=translationLogs_RU)
+    translation_RU = Translation(LANG=AvailableLanguages.RU, UI=translationUI_RU, TG_BOT=translationTGBot_RU, LOGS=translationLogs_RU)
 
     return translation_RU

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from .enums import OpenWeatherLang
+from .enums import AvailableLanguages, OpenWeatherLang
 
 
 class TranslationUI(BaseModel):
@@ -428,6 +428,7 @@ class TranslationTGBot(BaseModel):
     
 
 class Translation(BaseModel):
+    LANG: AvailableLanguages
     UI: TranslationUI
     TG_BOT: TranslationTGBot
     LOGS: TranslationLogs
